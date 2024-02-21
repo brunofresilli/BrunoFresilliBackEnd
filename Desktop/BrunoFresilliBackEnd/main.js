@@ -18,7 +18,6 @@ class ProductManager {
             console.log("El código del producto ya está en uso.");
             return;
         }
-
         const product = {
             id: this.nextId++, 
             title: title,
