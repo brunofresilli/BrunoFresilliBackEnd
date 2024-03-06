@@ -1,72 +1,7 @@
-const fs = require('fs');
-
-class ProductManager {
-    constructor(filePath) {
-        this.filePath = filePath;
-        this.nextId = 1;
-        this.loadProducts();
-    }
-
-    loadProducts() {
-        try {
-            const data = fs.readFileSync(this.filePath, 'utf8');
-            this.products = JSON.parse(data);
-        } catch (error) {
-            console.log("Error al cargar productos:", error.message);
-            this.products = [];
-        }
-    }
-
-    saveProducts() {
-        try {
-            fs.writeFileSync(this.filePath, JSON.stringify(this.products, null, 2));
-        } catch (error) {
-            console.log("Error al guardar productos:", error.message);
-        }
-    }
-
-    addProduct(product) {
-        product.id = this.nextId++; 
-        this.products.push(product);
-        this.saveProducts();
-    }
-
-    getProducts() {
-        this.loadProducts();
-        return this.products;
-    }
-
-    getProductById(id) {
-        this.loadProducts();
-        return this.products.find(product => product.id === id);
-    }
-
-    updateProduct(id, updatedProduct) {
-        const index = this.products.findIndex(product => product.id === id);
-        if (index !== -1) {
-            updatedProduct.id = id;
-            this.products[index] = updatedProduct;
-            this.saveProducts();
-            return true;
-        }
-        return false;
-    }
-
-    deleteProduct(id) {
-        const index = this.products.findIndex(product => product.id === id);
-        if (index !== -1) {
-            this.products.splice(index, 1);
-            this.saveProducts();
-            return true;
-        }
-        return false;
-    }
-}
-
+const ProductManager = require('./ProductManager');
 
 const filePath = 'products.json'; 
 const manager = new ProductManager(filePath);
-
 
 manager.addProduct({
     title: "Producto 1",
@@ -75,7 +10,6 @@ manager.addProduct({
     img: "imagen1.jpg",
     code: "ABC123",
     stock: 100
-    
 });
 manager.addProduct({
     title: "Producto 2",
@@ -85,7 +19,6 @@ manager.addProduct({
     code: "DEF456",
     stock: 50
 });
-
 manager.addProduct({
     title: "Producto 3",
     description: "Descripción del producto 3",
@@ -95,9 +28,7 @@ manager.addProduct({
     stock: 30
 });
 
-
-console.log(manager.getProducts());
-
+console.log(ProductManager.getProducts());
 
 manager.updateProduct(1, {
     title: "Producto 1 Modificado",
@@ -108,6 +39,6 @@ manager.updateProduct(1, {
     stock: 80
 });
 
-console.log(manager.getProductById(1));
+console.log(ProductManager.getProductById(1));
 
 manager.deleteProduct(2);
