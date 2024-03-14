@@ -1,0 +1,24 @@
+[
+  {
+    "id": 2,
+    "title": "Nombre del producto3",
+    "description": "Descripción del product3o",
+    "code": "Código del product3o",
+    "price": 10.99,
+    "status": true,
+    "stock": 100,
+    "category": "Categoría del producto",
+    "thumbnails": []
+  },
+  {
+    "id": 3,
+    "title": "Nombre del productonuevo",
+    "description": "Descripción del product3o",
+    "code": "Código del product3o",
+    "price": 10.99,
+    "status": true,
+    "stock": 100,
+    "category": "Categoría del producto",
+    "thumbnails": []
+  }
+]

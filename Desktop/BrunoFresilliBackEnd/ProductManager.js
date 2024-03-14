@@ -9,37 +9,72 @@ class ProductManager {
 
     loadProducts() {
         try {
+            
             const data = fs.readFileSync(this.filePath, 'utf8');
             this.products = JSON.parse(data);
+            
         } catch (error) {
-            console.log("Error al cargar productos:", error.message);
+            if (error.code === 'ENOENT') {
+                
+                this.saveProducts();
+            } else {
+                console.log("Error al cargar productos:", error.message);
+            }
         }
     }
-
     saveProducts() {
         try {
+            
             fs.writeFileSync(this.filePath, JSON.stringify(this.products, null, 2));
+            console.log("Productos guardados correctamente.");
         } catch (error) {
             console.log("Error al guardar productos:", error.message);
         }
     }
 
-    addProduct(product) {
-        product.id = this.getNextId(); 
-        this.products.push(product);
+    addProduct(productData) {
+      
+        const requiredFields = ['title', 'description', 'code', 'price', 'stock', 'category'];
+        for (const field of requiredFields) {
+            if (!productData[field]) {
+                throw new Error(`El campo ${field} es obligatorio`);
+            }
+        }
+    
+      
+        const newProductId = this.getNextId();
+    
+       
+        const newProduct = {
+            id: newProductId,
+            title: productData.title,
+            description: productData.description,
+            code: productData.code,
+            price: productData.price,
+            status: true, 
+            stock: productData.stock,
+            category: productData.category,
+            thumbnails: productData.thumbnails || []     
+        };
+    
+        
+        this.products.push(newProduct);
+    
         this.saveProducts();
+    
+        return newProduct;
     }
 
-    static getProducts() {
+    getProducts() {
         return this.products;
     }
 
-    static getProductById(id) {
-        return this.products.find(product => product.id === id);
+    getProductById(id) {
+        return this.products.find(product => product.id == id);
     }
 
     updateProduct(id, updatedProduct) {
-        const index = this.products.findIndex(product => product.id === id);
+        const index = this.products.findIndex(product => product.id == id);
         if (index !== -1) {
             updatedProduct.id = id;
             this.products[index] = updatedProduct;
@@ -50,7 +85,7 @@ class ProductManager {
     }
 
     deleteProduct(id) {
-        const index = this.products.findIndex(product => product.id === id);
+        const index = this.products.findIndex(product => product.id == id);
         if (index !== -1) {
             this.products.splice(index, 1);
             this.saveProducts();
