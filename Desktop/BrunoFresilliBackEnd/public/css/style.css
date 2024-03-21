@@ -1,0 +1,83 @@
+.cards-container {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  
+  .card {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin: 10px;
+    width: calc(33.33% - 20px); 
+    box-sizing: border-box;
+  }
+  
+  .card-info {
+    padding: 15px;
+    text-align: center; 
+  }
+  
+  .card-info h2 {
+    margin-top: 0;
+  }
+  
+  .card-info p {
+    margin: 5px 0;
+  }
+  
+  
+  #formAgregarProducto {
+    margin-top: 20px; 
+  }
+  
+  #formAgregarProducto div {
+    margin-bottom: 10px; 
+  }
+  
+  #formAgregarProducto label {
+    display: block; 
+  }
+  
+  #formAgregarProducto input[type="text"],
+  #formAgregarProducto input[type="number"],
+  #formAgregarProducto textarea {
+    width: 100%; 
+    padding: 5px; 
+    margin-top: 5px; 
+    box-sizing: border-box; 
+  }
+  
+  #formAgregarProducto button {
+    background-color: #007bff;
+    color: white; 
+    padding: 10px 20px; 
+    border: none; 
+    cursor: pointer; 
+  }
+  
+  #formAgregarProducto button:hover {
+    background-color: #0056b3; 
+  }
+  .delete-button {
+    background-color: #dc3545; 
+    color: #fff; 
+    border: none; 
+    border-radius: 5px; 
+    padding: 5px 10px; 
+    cursor: pointer; 
+    transition: background-color 0.3s;
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    
+}
+.button-container {
+    text-align: center; 
+    
+    
+}
+
+
+
+.delete-button:hover {
+    background-color: #c82333; 
+}

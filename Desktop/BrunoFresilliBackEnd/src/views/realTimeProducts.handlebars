@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lista de Productos en Tiempo Real</title>
+  <link rel="stylesheet" href="/css/style.css">
+  
+</head>
+<body>
+  <h1>Lista de Productos en Tiempo Real</h1>
+  <div id="lista-productos" class="card-info">
+    
+  </div>
+
+  <h1>Agregar Nuevo Producto</h1>
+
+  <form id="formAgregarProducto">
+    <div>
+        <label for="title">Nombre:</label>
+        <input type="text" id="title" name="title" required>
+    </div>
+    <div>
+        <label for="description">Descripción:</label>
+        <textarea id="description" name="description" required></textarea>
+    </div>
+    <div>
+        <label for="code">Código:</label>
+        <input type="text" id="code" name="code" required>
+    </div>
+    <div>
+        <label for="price">Precio:</label>
+        <input type="number" id="price" name="price" required>
+    </div>
+    <div>
+        <label for="stock">Stock:</label>
+        <input type="number" id="stock" name="stock" required>
+    </div>
+    <div>
+        <label for="category">Categoría:</label>
+        <input type="text" id="category" name="category" required>
+    </div>
+    <button type="submit">Agregar Producto</button>
+  </form>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+
+    function eliminarProducto(productoId) {
+      socket.emit('eliminar_producto', productoId); 
+    }
+
+    function actualizarListaProductos(productos) {
+      const listaProductos = document.getElementById('lista-productos');
+      listaProductos.innerHTML = '';
+
+     
+      const cardsContainer = document.createElement('div');
+      cardsContainer.classList.add('cards-container'); 
+
+      productos.forEach(producto => {
+        const card = document.createElement('div');
+        card.classList.add('card'); 
+
+        const cardInfo = document.createElement('div');
+        cardInfo.classList.add('card-info');
+
+        const title = document.createElement('h2');
+        title.textContent = producto.title;
+        cardInfo.appendChild(title);
+
+        const description = document.createElement('p');
+        description.textContent = producto.description;
+        cardInfo.appendChild(description);
+
+        const price = document.createElement('p');
+        price.textContent = `Precio: ${producto.price}`;
+        cardInfo.appendChild(price);
+
+        const stock = document.createElement('p');
+        stock.textContent = `Stock: ${producto.stock}`;
+        cardInfo.appendChild(stock);
+
+        const category = document.createElement('p');
+        category.textContent = `Categoría: ${producto.category}`;
+        cardInfo.appendChild(category);
+
+        const deleteButton = document.createElement('button');
+            deleteButton.textContent = 'Eliminar';
+            deleteButton.classList.add('delete-button'); 
+        const buttonContainer = document.createElement('div');
+          buttonContainer.classList.add('button-container'); 
+
+deleteButton.addEventListener('click', () => {
+    eliminarProducto(producto.id);
+});
+
+        
+        card.appendChild(cardInfo);
+
+        
+        cardsContainer.appendChild(card);
+    
+        
+        card.appendChild(deleteButton);
+  });
+      
+
+      
+      listaProductos.appendChild(cardsContainer);
+    }
+
+    socket.on('productos_iniciales', (productos) => {
+      actualizarListaProductos(productos);
+    });
+
+   
+    socket.on('actualizar_productos', (productos) => {
+      actualizarListaProductos(productos);
+    });
+
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      document.getElementById('formAgregarProducto').addEventListener('submit', function(event) {
+          event.preventDefault(); 
+
+          
+          const productData = {
+              title: document.getElementById('title').value,
+              description: document.getElementById('description').value,
+              code: document.getElementById('code').value,
+              price: document.getElementById('price').value,
+              stock: document.getElementById('stock').value,
+              category: document.getElementById('category').value
+          };
+
+      
+          socket.emit('agregar_producto', productData);
+      });
+    });
+  </script>
+</body>
+</html>

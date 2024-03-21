@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const ProductManager = require('../../ProductManager.js'); 
+const ProductManager = require('../ProductManager.js'); 
 
 
 const filePath = './products.json'; 

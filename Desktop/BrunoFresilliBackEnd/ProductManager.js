@@ -66,13 +66,16 @@ class ProductManager {
     }
 
     getProducts() {
+        
         return this.products;
     }
 
     getProductById(id) {
         return this.products.find(product => product.id == id);
     }
-
+    getProductByCode(code) {
+        return this.products.find(product => product.code === code);
+    }
     updateProduct(id, updatedProduct) {
         const index = this.products.findIndex(product => product.id == id);
         if (index !== -1) {
