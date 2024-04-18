@@ -1,105 +1,102 @@
-const fs = require('fs');
+const Product = require('./src/models/product.js');
 
 class ProductManager {
-    constructor(filePath) {
-        this.filePath = filePath;
-        this.products = [];
-        this.loadProducts();
+    constructor(Product) {
+        this.Product = Product;
     }
 
-    loadProducts() {
+    async loadProducts() {
         try {
-            
-            const data = fs.readFileSync(this.filePath, 'utf8');
-            this.products = JSON.parse(data);
-            
+            this.products = await this.Product.find().exec();
+            console.log("Productos cargados correctamente desde la base de datos.");
         } catch (error) {
-            if (error.code === 'ENOENT') {
-                
-                this.saveProducts();
-            } else {
-                console.log("Error al cargar productos:", error.message);
-            }
+            console.error("Error al cargar productos desde la base de datos:", error);
+            throw error;
         }
     }
-    saveProducts() {
+
+    async saveProducts() {
         try {
-            
-            fs.writeFileSync(this.filePath, JSON.stringify(this.products, null, 2));
-            console.log("Productos guardados correctamente.");
+            const Product = require('./src/models/product.js'); // Requerir el modelo dentro del método
+            await Promise.all(this.products.map(product => product.save()));
+            console.log("Productos guardados correctamente en la base de datos.");
         } catch (error) {
-            console.log("Error al guardar productos:", error.message);
+            console.error("Error al guardar productos en la base de datos:", error);
+            throw error;
+        }
+    }
+    async getProducts() {
+        try {
+            const products = await Product.find().exec();
+            return products;
+        } catch (error) {
+            console.error('Error al obtener productos:', error);
+            throw error;
         }
     }
 
-    addProduct(productData) {
-      
-        const requiredFields = ['title', 'description', 'code', 'price', 'stock', 'category'];
-        for (const field of requiredFields) {
-            if (!productData[field]) {
-                throw new Error(`El campo ${field} es obligatorio`);
+    async getProductById(productId) {
+        try {
+            const product = await Product.findById(productId).exec();
+            return product;
+        } catch (error) {
+            console.error('Error al obtener producto por ID:', error);
+            throw error;
+        }
+    }
+    async getProductByCode(code) {
+        try {
+            const product = await this.Product.findOne({ code }); // Corregir this.productModel a this.Product
+            return product; // Devuelve el producto si se encuentra
+        } catch (error) {
+            console.error('Error al obtener el producto por código:', error);
+            throw error;
+        }
+    }
+    async addProduct(productData) {
+        try {
+            if (!productData.code) {
+                throw new Error('El campo "code" es requerido.');
             }
+    
+            const newProduct = new Product({
+                title: productData.title,
+                description: productData.description,
+                code: productData.code,
+                price: productData.price,
+                status: true, 
+                stock: productData.stock,
+                category: productData.category,
+                thumbnails: productData.thumbnails || []     
+            });
+            await newProduct.save();
+            console.log("Producto agregado correctamente.");
+            return newProduct;
+        } catch (error) {
+            console.error('Error al agregar producto:', error);
+            throw error;
         }
-    
-      
-        const newProductId = this.getNextId();
-    
-       
-        const newProduct = {
-            id: newProductId,
-            title: productData.title,
-            description: productData.description,
-            code: productData.code,
-            price: productData.price,
-            status: true, 
-            stock: productData.stock,
-            category: productData.category,
-            thumbnails: productData.thumbnails || []     
-        };
-    
-        
-        this.products.push(newProduct);
-    
-        this.saveProducts();
-    
-        return newProduct;
     }
-
-    getProducts() {
-        
-        return this.products;
+    async updateProduct(productId, updatedProductData) {
+        try {
+            const updatedProduct = await Product.findByIdAndUpdate(productId, updatedProductData, { new: true }).exec();
+            console.log("Producto actualizado correctamente.");
+            return updatedProduct;
+        } catch (error) {
+            console.error('Error al actualizar producto:', error);
+            throw error;
+        }
     }
-
-    getProductById(id) {
-        return this.products.find(product => product.id == id);
-    }
-    getProductByCode(code) {
-        return this.products.find(product => product.code === code);
-    }
-    updateProduct(id, updatedProduct) {
-        const index = this.products.findIndex(product => product.id == id);
-        if (index !== -1) {
-            updatedProduct.id = id;
-            this.products[index] = updatedProduct;
-            this.saveProducts();
+    
+    async deleteProduct(productId) {
+        try {
+            await Product.findByIdAndDelete(productId).exec();
+            console.log("Producto eliminado correctamente.");
             return true;
+        } catch (error) {
+            console.error('Error al eliminar producto:', error);
+            throw error;
         }
-        return false;
-    }
-
-    deleteProduct(id) {
-        const index = this.products.findIndex(product => product.id == id);
-        if (index !== -1) {
-            this.products.splice(index, 1);
-            this.saveProducts();
-            return true;
-        }
-        return false;
-    }
-
-    getNextId() {
-        const maxId = this.products.reduce((max, product) => Math.max(max, product.id), 0);
-        return maxId + 1;
     }
 }
 

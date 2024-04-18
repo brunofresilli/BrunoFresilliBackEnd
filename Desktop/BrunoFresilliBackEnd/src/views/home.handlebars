@@ -16,51 +16,53 @@
   <script>
     const socket = io();
 
-  function actualizarListaProductos(productos) {
+function actualizarListaProductos(productos) {
   const listaProductos = document.getElementById('lista-productos');
   listaProductos.innerHTML = '';
 
-  
-  const cardsContainer = document.createElement('div');
-  cardsContainer.classList.add('cards-container'); 
+  if (Array.isArray(productos)) { // Verificar si productos es un array
+    const cardsContainer = document.createElement('div');
+    cardsContainer.classList.add('cards-container'); 
 
-  productos.forEach(producto => {
-    const card = document.createElement('div');
-    card.classList.add('card'); 
+    productos.forEach(producto => {
+      const card = document.createElement('div');
+      card.classList.add('card'); 
 
-    const cardInfo = document.createElement('div');
-    cardInfo.classList.add('card-info');
+      const cardInfo = document.createElement('div');
+      cardInfo.classList.add('card-info');
 
-    const title = document.createElement('h2');
-    title.textContent = producto.title;
-    cardInfo.appendChild(title);
+      const title = document.createElement('h2');
+      title.textContent = producto.title;
+      cardInfo.appendChild(title);
 
-    const description = document.createElement('p');
-    description.textContent = producto.description;
-    cardInfo.appendChild(description);
+      const description = document.createElement('p');
+      description.textContent = producto.description;
+      cardInfo.appendChild(description);
 
-    const price = document.createElement('p');
-    price.textContent = `Precio: ${producto.price}`;
-    cardInfo.appendChild(price);
+      const price = document.createElement('p');
+      price.textContent = `Precio: ${producto.price}`;
+      cardInfo.appendChild(price);
 
-    const stock = document.createElement('p');
-    stock.textContent = `Stock: ${producto.stock}`;
-    cardInfo.appendChild(stock);
+      const stock = document.createElement('p');
+      stock.textContent = `Stock: ${producto.stock}`;
+      cardInfo.appendChild(stock);
 
-    const category = document.createElement('p');
-    category.textContent = `Categoría: ${producto.category}`;
-    cardInfo.appendChild(category);
+      const category = document.createElement('p');
+      category.textContent = `Categoría: ${producto.category}`;
+      cardInfo.appendChild(category);
 
-    
-    card.appendChild(cardInfo);
+      card.appendChild(cardInfo);
+      cardsContainer.appendChild(card);
+    });
 
-    
-    cardsContainer.appendChild(card);
-  });
+    listaProductos.appendChild(cardsContainer);
+  } else {
+    // Si productos no es un array, mostrar un mensaje de error o manejarlo de otra manera
+    console.error('La variable productos no es un array:', productos);
+  }
+}
 
  
-  listaProductos.appendChild(cardsContainer);
-}
 
     
     socket.on('productos_iniciales', (productos) => {
