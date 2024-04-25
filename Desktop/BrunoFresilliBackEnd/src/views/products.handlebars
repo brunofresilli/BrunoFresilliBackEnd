@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lista de Productos</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+   <div id="welcome-message">
+        {{#if loggedIn}}
+        
+            <p>Bienvenido, {{username}}!</p>
+        {{else}}
+            <p>No hay sesión iniciada.</p>
+        {{/if}}
+    </div>
+  <div id="lista-productos" class="card-info">
+    
+  </div>
+
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.7.7/handlebars.min.js"></script>
+
+  
+  <script src="/socket.io/socket.io.js"></script>
+
+ 
+  
+  
+  <script>
+    const socket = io();
+
+    
+    socket.on('connect', () => {
+      console.log('Conexión establecida con el servidor.');
+
+      
+      socket.emit('productos_iniciales');
+    });
+
+    
+    function actualizarListaProductos(productos) {
+      console.log('Datos recibidos del servidor:', productos);
+      const listaProductos = document.getElementById('lista-productos');
+      listaProductos.innerHTML = '';
+
+      if (Array.isArray(productos)) {
+          productos.forEach(producto => {
+              console.log('Procesando producto:', producto);
+              const card = document.createElement('div');
+              card.classList.add('card');
+
+              const cardInfo = document.createElement('div');
+              cardInfo.classList.add('card-info');
+
+              const title = document.createElement('h2');
+              title.textContent = producto.title;
+              cardInfo.appendChild(title);
+
+              const price = document.createElement('p');
+              price.textContent = `Precio: ${producto.price}`;
+              cardInfo.appendChild(price);
+
+              const category = document.createElement('p');
+              category.textContent = `Categoría: ${producto.category}`;
+              cardInfo.appendChild(category);
+
+         
+              const verDetallesBtn = document.createElement('button');
+              verDetallesBtn.textContent = 'Ver detalles';
+              verDetallesBtn.addEventListener('click', () => {
+                  
+                  window.location.href = `/products/${producto._id}`;
+              });
+              cardInfo.appendChild(verDetallesBtn);
+
+             
+              const agregarAlCarritoBtn = document.createElement('button');
+              agregarAlCarritoBtn.textContent = 'Agregar al carrito';
+              agregarAlCarritoBtn.addEventListener('click', () => {
+                  
+                  socket.emit('agregar_producto_al_carrito', { productId: producto._id, quantity: 1 });
+
+              });
+              cardInfo.appendChild(agregarAlCarritoBtn);
+
+              card.appendChild(cardInfo);
+              listaProductos.appendChild(card);
+          });
+      } else {
+          console.error('Productos no es un array:', productos);
+      }
+    }
+
+    
+    socket.on('actualizar_productos', (productos) => {
+      actualizarListaProductos(productos);
+    });
+
+    
+    socket.on('productos_iniciales', (productos) => {
+      actualizarListaProductos(productos);
+    });
+
+    
+    const paginationTemplate = Handlebars.compile(`
+      <div class="pagination">
+        {{#if hasPrevPage}}
+          <a href="{{prevLink}}">Previous</a>
+        {{/if}}
+
+        {{#if hasNextPage}}
+          <a href="{{nextLink}}">Next</a>
+        {{/if}}
+      </div>
+    `);
+
+   
+const hasPrevPage = {{#if hasPrevPage}} true {{else}} false {{/if}};
+const hasNextPage = {{#if hasNextPage}} true {{else}} false {{/if}};
+const prevLink = "{{prevLink}}";
+const nextLink = "{{nextLink}}";
+
+
+    
+    const paginationHtml = paginationTemplate({ hasPrevPage, hasNextPage, prevLink, nextLink });
+    document.body.insertAdjacentHTML('beforeend', paginationHtml);
+  </script>
+</body>
+</html>
+

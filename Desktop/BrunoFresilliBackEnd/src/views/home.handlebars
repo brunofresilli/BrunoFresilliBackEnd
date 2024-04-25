@@ -20,7 +20,7 @@ function actualizarListaProductos(productos) {
   const listaProductos = document.getElementById('lista-productos');
   listaProductos.innerHTML = '';
 
-  if (Array.isArray(productos)) { // Verificar si productos es un array
+  if (Array.isArray(productos)) { 
     const cardsContainer = document.createElement('div');
     cardsContainer.classList.add('cards-container'); 
 
@@ -57,7 +57,7 @@ function actualizarListaProductos(productos) {
 
     listaProductos.appendChild(cardsContainer);
   } else {
-    // Si productos no es un array, mostrar un mensaje de error o manejarlo de otra manera
+    
     console.error('La variable productos no es un array:', productos);
   }
 }

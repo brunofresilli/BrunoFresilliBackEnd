@@ -108,5 +108,118 @@
     "stock": "50",
     "category": "Accesorios",
     "thumbnails": []
-  }
-]
+  },
+  {
+  
+    
+      "id": 11,
+      "title": "Silla ergonómica de oficina",
+      "description": "Silla de oficina ergonómica con soporte lumbar ajustable y reposabrazos acolchados.",
+      "code": "SO1101",
+      "price": "150",
+      "status": true,
+      "stock": "50",
+      "category": "Muebles",
+      "thumbnails": []
+    },
+    {
+      "id": 12,
+      "title": "Mesa de comedor extensible",
+      "description": "Mesa de comedor extensible con acabado en roble y capacidad para 6 personas.",
+      "code": "MC1202",
+      "price": "300",
+      "status": true,
+      "stock": "20",
+      "category": "Muebles",
+      "thumbnails": []
+    },
+    {
+      "id": 13,
+      "title": "Set de cuchillos de cocina",
+      "description": "Set de cuchillos de cocina de acero inoxidable con mango ergonómico y bloque de madera.",
+      "code": "CU1303",
+      "price": "50",
+      "status": true,
+      "stock": "30",
+      "category": "Cocina",
+      "thumbnails": []
+    },
+    {
+      "id": 14,
+      "title": "Robot aspirador inteligente",
+      "description": "Robot aspirador con tecnología de mapeo inteligente y control remoto desde el smartphone.",
+      "code": "RA1404",
+      "price": "250",
+      "status": true,
+      "stock": "15",
+      "category": "Electrodomésticos",
+      "thumbnails": []
+    },
+    {
+      "id": 15,
+      "title": "Lámpara de pie moderna",
+      "description": "Lámpara de pie con diseño moderno y regulador de intensidad lumínica.",
+      "code": "LP1505",
+      "price": "80",
+      "status": true,
+      "stock": "25",
+      "category": "Iluminación",
+      "thumbnails": []
+    },
+    {
+      "id": 16,
+      "title": "Patinete eléctrico plegable",
+      "description": "Patinete eléctrico plegable con motor de 250W y autonomía de hasta 25 km.",
+      "code": "PA1606",
+      "price": "350",
+      "status": true,
+      "stock": "10",
+      "category": "Deportes",
+      "thumbnails": []
+    },
+    {
+      "id": 17,
+      "title": "Altavoz Bluetooth portátil",
+      "description": "Altavoz Bluetooth portátil con resistencia al agua y batería de larga duración.",
+      "code": "AL1707",
+      "price": "70",
+      "status": true,
+      "stock": "40",
+      "category": "Electrónica",
+      "thumbnails": []
+    },
+    {
+      "id": 18,
+      "title": "Set de herramientas para bricolaje",
+      "description": "Set de herramientas para bricolaje con destornilladores, martillo, llaves inglesas y más.",
+      "code": "HE1808",
+      "price": "100",
+      "status": true,
+      "stock": "20",
+      "category": "Herramientas",
+      "thumbnails": []
+    },
+    {
+      "id": 19,
+      "title": "Silla de camping plegable",
+      "description": "Silla de camping plegable con reposabrazos y portavasos integrado.",
+      "code": "SC1909",
+      "price": "25",
+      "status": true,
+      "stock": "50",
+      "category": "Aire libre",
+      "thumbnails": []
+    },
+    {
+      "id": 20,
+      "title": "Juego de té porcelana",
+      "description": "Juego de té de porcelana con diseño floral y tetera de estilo vintage.",
+      "code": "TE2010",
+      "price": "40",
+      "status": true,
+      "stock": "30",
+      "category": "Hogar",
+      "thumbnails": []
+    }
+  ]
+  

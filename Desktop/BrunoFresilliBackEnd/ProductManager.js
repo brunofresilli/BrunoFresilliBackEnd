@@ -17,7 +17,7 @@ class ProductManager {
 
     async saveProducts() {
         try {
-            const Product = require('./src/models/product.js'); // Requerir el modelo dentro del método
+            const Product = require('./src/models/product.js'); 
             await Promise.all(this.products.map(product => product.save()));
             console.log("Productos guardados correctamente en la base de datos.");
         } catch (error) {
@@ -46,8 +46,8 @@ class ProductManager {
     }
     async getProductByCode(code) {
         try {
-            const product = await this.Product.findOne({ code }); // Corregir this.productModel a this.Product
-            return product; // Devuelve el producto si se encuentra
+            const product = await this.Product.findOne({ code }); 
+            return product; 
         } catch (error) {
             console.error('Error al obtener el producto por código:', error);
             throw error;

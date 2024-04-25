@@ -98,8 +98,9 @@
     }
 
     
-    socket.on('connect', () => {
-      socket.emit('productos_iniciales');
+   socket.on('productos_iniciales', (productos) => {
+      console.log('Productos iniciales recibidos:', productos);
+      actualizarListaProductos(productos);
     });
 
     socket.on('actualizar_productos', (productos) => {
