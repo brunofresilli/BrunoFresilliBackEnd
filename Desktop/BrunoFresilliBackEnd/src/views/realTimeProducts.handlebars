@@ -1,14 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lista de Productos en Tiempo Real</title>
-  <link rel="stylesheet" href="/css/style.css">
-</head>
-<body>
-  <h1>Lista de Productos en Tiempo Real</h1>
-  <div id="lista-productos" class="card-info"></div>
 
   <h1>Agregar Nuevo Producto</h1>
 
@@ -37,95 +26,24 @@
       <label for="category">Categoría:</label>
       <input type="text" id="category" name="category" required>
     </div>
-    <button type="submit">Agregar Producto</button>
+    <button id="button-create" onclick="createProduct(event)">Agregar Producto</button>
   </form>
 
+ <hr>
+
+    <div class="cards-container">
+        {{#each products}}
+            <div class="card">
+                <h3>{{this.title}}</h3>
+                <hr>
+                <p>Categoria: {{this.category}}</p>
+                <p>Descripción: {{this.description}}</p>
+                <p>Precio: $ {{this.price}}</p>
+                <button id="button-delete" onclick="deleteProduct({{this.id}})">Eliminar</button>
+            </div>
+        {{/each}}
+    </div>
+</div>
   <script src="/socket.io/socket.io.js"></script>
-  <script>
-    const socket = io();
-
-    function eliminarProducto(productoId) {
-      socket.emit('eliminar_producto', productoId); 
-    }
-
-    function actualizarListaProductos(productos) {
-      console.log('Datos recibidos del servidor:', productos);
-      const listaProductos = document.getElementById('lista-productos');
-      listaProductos.innerHTML = '';
-
-      if (Array.isArray(productos)) {
-        productos.forEach(producto => {
-          const card = document.createElement('div');
-          card.classList.add('card');
-
-          const cardInfo = document.createElement('div');
-          cardInfo.classList.add('card-info');
-
-          const title = document.createElement('h2');
-          title.textContent = producto.title;
-          cardInfo.appendChild(title);
-
-          const description = document.createElement('p');
-          description.textContent = producto.description;
-          cardInfo.appendChild(description);
-
-          const price = document.createElement('p');
-          price.textContent = `Precio: ${producto.price}`;
-          cardInfo.appendChild(price);
-
-          const stock = document.createElement('p');
-          stock.textContent = `Stock: ${producto.stock}`;
-          cardInfo.appendChild(stock);
-
-          const category = document.createElement('p');
-          category.textContent = `Categoría: ${producto.category}`;
-          cardInfo.appendChild(category);
-
-          const deleteButton = document.createElement('button');
-          deleteButton.textContent = 'Eliminar';
-          deleteButton.classList.add('delete-button');
-          deleteButton.addEventListener('click', () => {
-            eliminarProducto(producto._id);
-          });
-
-          card.appendChild(cardInfo);
-          card.appendChild(deleteButton);
-          listaProductos.appendChild(card);
-        });
-      } else {
-        console.error('Productos no es un array:', productos);
-      }
-    }
-
+  <script src="/js/index.js"></script>
     
-   socket.on('productos_iniciales', (productos) => {
-      console.log('Productos iniciales recibidos:', productos);
-      actualizarListaProductos(productos);
-    });
-
-    socket.on('actualizar_productos', (productos) => {
-      console.log('Productos actualizados recibidos:', productos);
-      actualizarListaProductos(productos);
-    });
-
-    document.addEventListener('DOMContentLoaded', function() {
-      document.getElementById('formAgregarProducto').addEventListener('submit', function(event) {
-        event.preventDefault(); 
-
-        const productData = {
-          title: document.getElementById('title').value,
-          code: document.getElementById('code').value,
-          description: document.getElementById('description').value,
-          price: document.getElementById('price').value,
-          stock: document.getElementById('stock').value,
-          category: document.getElementById('category').value
-        };
-
-        console.log('Datos del producto a enviar:', productData);
-
-        socket.emit('agregar_producto', productData);
-      });
-    });
-  </script>
-</body>
-</html>

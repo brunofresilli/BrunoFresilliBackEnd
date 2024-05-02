@@ -12,6 +12,11 @@
 
         <button type="submit">Login</button>
     </form>
+     <span>
+        <a href="/api/sessions/github">
+            <button>Entrar con Github</button>
+        </a>
+    </span>
     <br>
     <span><a href="/register" target="_self">Register</a></span>
 </div>
@@ -19,5 +24,10 @@
 {{#if failLogin}}
     <script type="text/javascript">
         alert('Login Failed!');
+    </script>
+{{/if}}
+{{#if registerSuccess}}
+    <script type="text/javascript">
+        alert('Register Success!');
     </script>
 {{/if}}
