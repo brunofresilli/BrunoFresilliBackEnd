@@ -14,19 +14,9 @@ const userSchema = mongoose.Schema({
         type: String,
         unique: true
     },
-    username: {
-        type: String,
-       
-        unique: true
-    },
     password: {
         type: String,
         
-    },
-    githubId: {
-        type: String,
-       
-        unique: true
     },
     role: {
         type: String,

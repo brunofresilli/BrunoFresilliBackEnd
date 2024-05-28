@@ -1,6 +1,7 @@
 
 const express = require('express');
-const Cart = require('../dao/models/cart.js');
+const cartController = require('../controllers/cartController');
+
 
 const router = express.Router();
 
@@ -20,7 +21,7 @@ router.post('/', async (req, res) => {
 router.get('/:cid', async (req, res) => {
     const { cid } = req.params;
     try {
-        const cart = await Cart.findById(cid).populate('products.productId');
+        const cart = await cartController.findById(cid).populate('products.productId');
         if (!cart) {
             return res.status(404).json({ message: 'Carrito no encontrado' });
         }
@@ -36,7 +37,7 @@ router.post('/:cid/products/:pid', async (req, res) => {
     const { cid, pid } = req.params;
     const { quantity } = req.body;
     try {
-        const cart = await Cart.findById(cid);
+        const cart = await cartController.findById(cid);
         if (!cart) {
             return res.status(404).json({ error: 'Carrito no encontrado' });
         }
@@ -54,7 +55,7 @@ router.put('/:cid', async (req, res) => {
     const { cid } = req.params;
     const { products } = req.body;
     try {
-        const cart = await Cart.findByIdAndUpdate(cid, { products }, { new: true });
+        const cart = await cartController.findByIdAndUpdate(cid, { products }, { new: true });
         if (!cart) {
             return res.status(404).json({ error: 'Carrito no encontrado' });
         }
@@ -70,7 +71,7 @@ router.put('/:cid/products/:pid', async (req, res) => {
     const { cid, pid } = req.params;
     const { quantity } = req.body;
     try {
-        const cart = await Cart.findById(cid);
+        const cart = await cartController.findById(cid);
         if (!cart) {
             return res.status(404).json({ error: 'Carrito no encontrado' });
         }
@@ -91,7 +92,7 @@ router.put('/:cid/products/:pid', async (req, res) => {
 router.delete('/:cid', async (req, res) => {
     const { cid } = req.params;
     try {
-        const cart = await Cart.findByIdAndDelete(cid);
+        const cart = await cartController.findByIdAndDelete(cid);
         if (!cart) {
             return res.status(404).json({ error: 'Carrito no encontrado' });
         }
@@ -105,7 +106,7 @@ router.delete('/:cid', async (req, res) => {
 router.delete('/:cid/products/:pid', async (req, res) => {
     const { cid, pid } = req.params;
     try {
-        const cart = await Cart.findById(cid);
+        const cart = await cartController.findById(cid);
         if (!cart) {
             return res.status(404).json({ error: 'Carrito no encontrado' });
         }

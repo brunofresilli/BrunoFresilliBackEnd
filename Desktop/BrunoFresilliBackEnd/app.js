@@ -6,9 +6,9 @@ const {Server} = require('socket.io');
 const mongoose = require('mongoose');
 const mongoStore = require ('connect-mongo'); 
 const passport = require ('passport');
-
-
 const path = require('path');
+
+const config = require ('./config.js');
 const websocket = require ('./websocket.js');
 const cartsRouter = require('./src/routes/cartsRouter.js');
 const productsRouter = require('./src/routes/productsRouter.js');
@@ -18,13 +18,14 @@ const initializatePassport = require ('./src/dao/config/passportConfig.js');
 
 const app = express();
 
-
+const mongoUrl = config.mongodbUri;
+const PORT = config.port;
 
 app.use(session(
     {
         store: mongoStore.create(
             {
-                mongoUrl: "mongodb+srv://BrunoFresilli:nerfxnephipls11@cluster0.kouwtog.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
+                mongoUrl: mongoUrl,
                 ttl: 20 
             }
         ),
@@ -40,7 +41,7 @@ app.use(session(
 
 //Mongo atlas connect
 async function connectToDatabase() {
-    const dbURI = "mongodb+srv://BrunoFresilli:nerfxnephipls11@cluster0.kouwtog.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+    const dbURI = mongoUrl;
     const options = {
         dbName: "Productos", 
     };
@@ -84,7 +85,7 @@ app.use('/realTimeProducts', viewsRouter);
 
 
 
-const PORT = 8080;
+
 const httpServer = app.listen(PORT, () => {
     console.log(`Start server in PORT ${PORT}`);
 });

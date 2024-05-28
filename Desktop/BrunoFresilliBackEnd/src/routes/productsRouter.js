@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const ProductManager = require('../dao/models/product.js'); 
+const productController = require('../controllers/productController.js');
+
 
 const BASE_URL = 'http://localhost:8080/products';
 router.get('/products', async (req, res) => {
@@ -21,7 +22,7 @@ router.get('/products', async (req, res) => {
             sort: sort ? { price: sort === 'asc' ? 1 : -1 } : null
         };
 
-        const products = await ProductManager.paginate({}, { page, limit: 10, lean: true });
+        const products = await productController.paginate({}, { page, limit: 10, lean: true });
 
 
         const response = {
@@ -47,7 +48,7 @@ router.get('/products', async (req, res) => {
 router.post('/realTimeProducts', async (req, res) => {
     const productData = req.body;
     try {
-        const newProduct = await ProductManager.addProduct(productData);
+        const newProduct = await productController.addProduct(productData);
         res.status(201).json(newProduct);
     } catch (error) {
         res.status(400).json({ error: error.message });
@@ -58,7 +59,7 @@ router.put('/:pid', async (req, res) => {
     const productId = req.params.pid;
     const updatedData = req.body;
     try {
-        const updatedProduct = await ProductManager.updateProduct(productId, updatedData);
+        const updatedProduct = await productController.updateProduct(productId, updatedData);
         if (!updatedProduct) {
             res.status(404).json({ error: 'Producto no encontrado' });
         } else {
@@ -72,7 +73,7 @@ router.put('/:pid', async (req, res) => {
 router.delete('/:pid', async (req, res) => {
     const productId = req.params.pid;
     try {
-        const deletedProduct = await ProductManager.deleteProduct(productId);
+        const deletedProduct = await productControllerp.deleteProduct(productId);
         if (!deletedProduct) {
             res.status(404).json({ error: 'Producto no encontrado' });
         } else {

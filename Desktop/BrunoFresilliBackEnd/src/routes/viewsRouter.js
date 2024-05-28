@@ -1,11 +1,8 @@
 const { Router } = require('express');
 const  productModel = require ('../dao/models/product.js')
 const  auth  = require ('../middlewares/auth.js');
+const ProductController = require('../controllers/productController');
 
-
-const ProductManager = require('../dao/ProductManager.js');
-
-const ProductService = new ProductManager();
 
 const router = Router();
 
@@ -63,7 +60,7 @@ router.get('/realtimeproducts', async (req, res) => {
         {
             title: 'realTimeProductos',
             style: 'style.css',
-            products: await ProductService.getProducts()
+            products: await ProductController.getProducts()
         }
     )
 });
