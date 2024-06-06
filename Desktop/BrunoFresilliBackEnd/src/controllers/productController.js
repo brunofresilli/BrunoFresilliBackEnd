@@ -51,10 +51,7 @@ class ProductController {
         try {
             const productId = req.params.id;
             const updatedProductData = req.body;
-            const result = await productService.updateProduct(productId, updatedProductData);
-            if (result.nModified === 0) {
-                return res.status(404).json({ error: 'Producto no encontrado' });
-            }
+            await productService.updateProduct(productId, updatedProductData);
             res.status(200).json({ message: 'Producto actualizado correctamente' });
         } catch (error) {
             res.status(500).json({ error: 'Error al actualizar el producto' });
@@ -64,10 +61,7 @@ class ProductController {
     async deleteProduct(req, res) {
         try {
             const productId = req.params.id;
-            const result = await productService.deleteProduct(productId);
-            if (!result) {
-                return res.status(404).json({ error: 'Producto no encontrado' });
-            }
+            await productService.deleteProduct(productId);
             res.status(200).json({ message: 'Producto eliminado correctamente' });
         } catch (error) {
             res.status(500).json({ error: 'Error al eliminar producto' });

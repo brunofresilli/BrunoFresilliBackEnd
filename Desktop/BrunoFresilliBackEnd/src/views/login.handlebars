@@ -2,7 +2,7 @@
     <h1>Login</h1>
     <hr>
 
-    <form class="box" method="post" action="/api/sessions/login">
+    <form class="box" method="post" action="/products">
 
         <label for="email">Email</label>
         <input type="email" name="email" id="email">
@@ -31,3 +31,20 @@
         alert('Register Success!');
     </script>
 {{/if}}
+<script>
+    fetch('/login', {
+  method: 'POST',
+  body: JSON.stringify({  }),
+  headers: {
+    'Content-Type': 'application/json'
+  }
+})
+.then(response => response.json())
+.then(data => {
+  
+  localStorage.setItem('token', data.token);
+})
+.catch(error => {
+  console.error('Error durante el inicio de sesión:', error);
+});
+</script>

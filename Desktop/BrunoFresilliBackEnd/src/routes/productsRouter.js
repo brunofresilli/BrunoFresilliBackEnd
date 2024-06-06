@@ -1,10 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const productController = require('../controllers/productController.js');
+const authorize = require('../middlewares/authJWT.js');
 
+
+const User = require('../dao/models/user.js');
 
 const BASE_URL = 'http://localhost:8080/products';
-router.get('/products', async (req, res) => {
+router.get('/products',  async (req, res) => {
     try {
         const limit = parseInt(req.query.limit) || 10;
         const page = parseInt(req.query.page) || 1;
@@ -45,7 +48,7 @@ router.get('/products', async (req, res) => {
     }
 });
 
-router.post('/realTimeProducts', async (req, res) => {
+router.post('/realTimeProducts', authorize('admin'), async (req, res) => {
     const productData = req.body;
     try {
         const newProduct = await productController.addProduct(productData);
@@ -55,7 +58,7 @@ router.post('/realTimeProducts', async (req, res) => {
     }
 });
 
-router.put('/:pid', async (req, res) => {
+router.put('/:pid', authorize('admin'), async (req, res) => {
     const productId = req.params.pid;
     const updatedData = req.body;
     try {
@@ -70,7 +73,7 @@ router.put('/:pid', async (req, res) => {
     }
 });
 
-router.delete('/:pid', async (req, res) => {
+router.delete('/:pid', authorize('admin') , async (req, res) => {
     const productId = req.params.pid;
     try {
         const deletedProduct = await productControllerp.deleteProduct(productId);

@@ -1,11 +1,12 @@
 const {Router} = require ('express');
 const passport = require ('passport');
+const jwt = require('jsonwebtoken');
 
 
 
 
 const router = Router();
-
+const JWT_SECRET = 'mi_clave_secreta';
 
 router.post("/login", (req, res, next) => {
     passport.authenticate('login', (err, user, info) => {
@@ -27,8 +28,16 @@ router.post("/login", (req, res, next) => {
             }
             req.session.user = user;
             req.session.loggedIn = true;
-            req.session.username = user.first_name; 
-            return res.redirect('/products');
+            req.session.username = user.first_name;
+
+            
+            const token = jwt.sign({ userId: user._id }, JWT_SECRET);
+
+
+           
+            return res.json({ token });
+
+            
         });
     })(req, res, next);
 });
