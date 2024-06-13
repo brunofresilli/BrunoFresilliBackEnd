@@ -41,4 +41,23 @@ const productSchema = new mongoose.Schema({
 productSchema.plugin(mongoosePaginate);
 const productModel = mongoose.model(productCollection, productSchema);
 
-module.exports = productModel ;
+function isValidProductData(productData) {
+    // Verificar que todos los campos requeridos estén presentes y tengan los tipos correctos
+    if (!productData ||
+        typeof productData.title !== 'string' ||
+        typeof productData.description !== 'string' ||
+        typeof productData.code !== 'string' ||
+        typeof productData.price !== 'number' ||
+        typeof productData.status !== 'boolean' ||
+        typeof productData.stock !== 'number' ||
+        typeof productData.category !== 'string') {
+        return false;
+    }
+
+    // Puedes agregar validaciones adicionales según tus necesidades, como verificar la unicidad del código, etc.
+
+    return true;
+}
+
+
+module.exports ={ productModel , isValidProductData} ;

@@ -3,6 +3,8 @@ const GitHubStrategy = require('passport-github2');
 const local = require('passport-local');
 const userModel = require('../dao/models/user.js');
 const  { createHash, isValidPassword }  = require ('../utils/functionsUtils.js')
+const { ExtractJwt } = require ('passport-jwt');
+const jwt = require ('passport-jwt');
 
 const localStratergy = local.Strategy;
 const initializePassport = () => {
@@ -92,5 +94,38 @@ const initializePassport = () => {
         done(null, user);
     });
 };
+
+const JWTStrategy = jwt.Strategy;
+
+const cookieExtractor = (req) => {
+    let token = null;
+    if (req && req.cookies) {
+      token = req.cookies.access_token ?? null;
+    }
+    return token;
+  };
+  const JWT_SECRET = "1234"
+
+  passport.use(
+    "jwt",
+    new JWTStrategy(
+      {
+        jwtFromRequest: ExtractJwt.fromExtractors([cookieExtractor]),
+        secretOrKey: JWT_SECRET,
+      },
+      async (jwt_payload, done) => {
+        try {
+            // Verifica que el payload contiene 'role'
+            if (!jwt_payload.role) {
+              throw new Error('Token payload does not contain role');
+            }
+          return done(null, jwt_payload);
+        } catch (error) {
+          return done(error);
+        }
+      }
+    )
+  );
+
 
 module.exports = initializePassport;

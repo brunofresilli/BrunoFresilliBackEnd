@@ -13,7 +13,7 @@
                 <p>Categoria: {{this.category}}</p>
                 <p>Descripción: {{this.description}}</p>
                 <p>Precio: $ {{this.price}}</p>
-                <button class="button-addCart" ,onclick="createProduct(event)", data-product-id="{{this.id}}">agregar al carrito</button>
+                <button class="button-addCart" data-product-id = {{this.id}}  data-cart-id="{{this.user.id}}">agregar al carrito</button>
             </div>
         {{/each}}
         </div>
@@ -30,7 +30,7 @@
             {{/if}}
         </div>
         <div>
-            <a href="">ir al carrito</a>
+            <a href="/cart?cid={{user.cartId}}">ir al carrito</a>
         </div>
     {{else}}
        <h2>No hay productos para mostrar</h2>
@@ -41,67 +41,3 @@
 
 <script src="/socket.io/socket.io.js"></script>
 <script src="../../websocket.js"></script>
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('DOMContentLoaded event fired');
-    const queryString = window.location.search;
-    const urlParams = new URLSearchParams(queryString);
-    const token = urlParams.get('token');
-    console.log('Token recibido:', token);
-
-    if (token) {
-        localStorage.setItem('token', token);
-        console.log('Token almacenado en localStorage:', token);
-
-       
-        fetch('/products', {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        })
-        .then(response => {
-            if (response.ok) {
-                
-                return response.json();
-            } else {
-                
-                throw new Error('Error en la solicitud');
-            }
-        })
-        .then(data => {
-            
-            console.log('Productos:', data);
-            
-        })
-        .catch(error => {
-           
-            console.error('Error:', error);
-        });
-    } else {
-        console.error('No se ha recibido ningún token.');
-    }
-});
-
-const socket = io();
-
-socket.on('connect', () => {
-    console.log('Conexión al servidor establecida correctamente');
-});
-
-const addCartButtons = document.querySelectorAll('.button-addCart');
-addCartButtons.forEach(button => {
-    button.addEventListener('click', (event) => {
-        const productId = event.target.getAttribute('data-product-id');
-        socket.emit('addProductToCart', { productId });
-    });
-});
-
-socket.on('productAddedToCart', (data) => {
-    if (data.success) {
-        alert('Producto agregado al carrito exitosamente!');
-    } else {
-        alert('Error al agregar producto al carrito.');
-    }
-});
-</script>

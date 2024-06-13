@@ -1,55 +1,78 @@
 const cartService = require('../services/cartService');
+const CustomError = require('../services/errors/CustomError');
+const { ErrorCodes } = require('../services/errors/enums');
+const { generateCartErrorInfo } = require('../services/errors/info'); 
 
 class CartController {
-    async createCart(req, res) {
+    async createCart(req, res, next) {
         try {
             const { products } = req.body;
             const newCart = await cartService.createCart(products);
             res.status(201).json(newCart);
         } catch (error) {
-            res.status(500).json({ error: 'Error creating cart' });
+            next(CustomError.createError({
+                name: 'Database Error',
+                cause: error,
+                message: 'Error creating cart',
+                code: ErrorCodes.DATABASE_ERROR,
+            }));
         }
     }
 
-    async getCartProducts(req, res) {
+    async getCartProducts(req, res, next) {
         try {
             const cartId = req.params.id;
             const products = await cartService.getCartProducts(cartId);
             if (!products) {
-                return res.status(404).json({ error: 'Cart not found' });
+                throw CustomError.createError({
+                    name: 'Cart Not Found',
+                    cause: `Cart with ID ${cartId} not found`,
+                    message: 'Cart not found',
+                    code: ErrorCodes.CART_OPERATION_ERROR,
+                });
             }
             res.status(200).json(products);
         } catch (error) {
-            res.status(500).json({ error: 'Error getting cart products' });
+            next(error);
         }
     }
 
-    async addProductToCart(req, res) {
+    async addProductToCart(req, res, next) {
         try {
             const cartId = req.params.id;
             const { productId, quantity } = req.body;
             const result = await cartService.addProductToCart(cartId, productId, quantity);
             res.status(200).json(result);
         } catch (error) {
-            res.status(500).json({ error: 'Error adding product to cart' });
+            next(CustomError.createError({
+                name: 'Database Error',
+                cause: error,
+                message: 'Error adding product to cart',
+                code: ErrorCodes.DATABASE_ERROR,
+            }));
         }
     }
 
-    async updateCart(req, res) {
+    async updateCart(req, res, next) {
         try {
             const cartId = req.params.id;
             const { products } = req.body;
             const updatedCart = await cartService.updateCart(cartId, products);
             if (!updatedCart) {
-                return res.status(404).json({ error: 'Cart not found' });
+                throw CustomError.createError({
+                    name: 'Cart Not Found',
+                    cause: `Cart with ID ${cartId} not found`,
+                    message: 'Cart not found',
+                    code: ErrorCodes.CART_OPERATION_ERROR,
+                });
             }
             res.status(200).json(updatedCart);
         } catch (error) {
-            res.status(500).json({ error: 'Error updating cart' });
+            next(error);
         }
     }
 
-    async updateProductQuantity(req, res) {
+    async updateProductQuantity(req, res, next) {
         try {
             const cartId = req.params.id;
             const { productId } = req.params;
@@ -57,34 +80,49 @@ class CartController {
             const result = await cartService.updateProductQuantity(cartId, productId, quantity);
             res.status(200).json(result);
         } catch (error) {
-            res.status(500).json({ error: 'Error updating product quantity in cart' });
+            next(CustomError.createError({
+                name: 'Database Error',
+                cause: error,
+                message: 'Error updating product quantity in cart',
+                code: ErrorCodes.DATABASE_ERROR,
+            }));
         }
     }
 
-    async deleteCart(req, res) {
+    async deleteCart(req, res, next) {
         try {
             const cartId = req.params.id;
             const result = await cartService.deleteCart(cartId);
             if (!result) {
-                return res.status(404).json({ error: 'Cart not found' });
+                throw CustomError.createError({
+                    name: 'Cart Not Found',
+                    cause: `Cart with ID ${cartId} not found`,
+                    message: 'Cart not found',
+                    code: ErrorCodes.CART_OPERATION_ERROR,
+                });
             }
             res.status(200).json({ message: 'Cart deleted successfully' });
         } catch (error) {
-            res.status(500).json({ error: 'Error deleting cart' });
+            next(error);
         }
     }
 
-    async removeProductFromCart(req, res) {
+    async removeProductFromCart(req, res, next) {
         try {
             const cartId = req.params.id;
             const { productId } = req.params;
             const result = await cartService.removeProductFromCart(cartId, productId);
             if (!result) {
-                return res.status(404).json({ error: 'Product not found in cart' });
+                throw CustomError.createError({
+                    name: 'Product Not Found in Cart',
+                    cause: `Product with ID ${productId} not found in cart`,
+                    message: 'Product not found in cart',
+                    code: ErrorCodes.CART_OPERATION_ERROR,
+                });
             }
             res.status(200).json(result);
         } catch (error) {
-            res.status(500).json({ error: 'Error removing product from cart' });
+            next(error);
         }
     }
 }

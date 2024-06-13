@@ -1,4 +1,4 @@
-// services/productService.js
+
 const ProductRepository = require('../repositories/productRepository');
 const ProductDTO = require('../dao/dto/productDTO.js');
 
