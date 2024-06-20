@@ -4,6 +4,7 @@ const authorize = require('../middlewares/authJWT.js');
 const ProductController = require('../controllers/productController');
 const { generateFakeProduct } = require('../utils/fakerUtil.js')
 const passport = require ('passport')
+const { logger } = require('../utils/logger.js');
 
 
 
@@ -15,7 +16,7 @@ router.get("/products",
     passport.authenticate("jwt", { session: false }),
     authorize("user"),
     async (req, res) => {
-    console.log('User JWT:', req.user)
+    //console.log('User JWT:', req.user)
     
     let page = parseInt(req.query.page);
     if (!page) page = 1;
@@ -30,6 +31,7 @@ router.get("/products",
         loggedIn: true, 
         username: req.user.email,
         title: 'ProductosHome',
+        userId: req.user.cart, 
         style: 'style.css',
         result
     });
@@ -96,6 +98,25 @@ router.get('/mockingproducts', (req, res) => {
         status: 'success',
         payload: products
     });
+});
+
+router.get('/loggerTest', (req, res) => {
+    // Registrar diferentes niveles de logs para probar
+    logger.fatal('Este es un mensaje fatal');
+    logger.error('Este es un mensaje de error');
+    logger.warning('Este es un mensaje de advertencia');
+    logger.info('Este es un mensaje de información');
+    logger.http('Este es un mensaje HTTP');
+    logger.debug('Este es un mensaje de depuración');
+
+    res.send('Logs probados con éxito');
+});
+
+// POST /loggerTest
+router.post('/loggerTest', (req, res) => {
+    // Simular una operación de creación o actualización y registrar un mensaje de log
+    logger.info('Se ha recibido una solicitud POST en /loggerTest');
+    res.status(201).send('Solicitud POST procesada con éxito');
 });
 
 module.exports = router;

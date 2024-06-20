@@ -9,7 +9,8 @@ const path = require('path');
 require('dotenv').config();
 const cookieParser = require('cookie-parser');
 
-const config = require('./config.js');
+const { addLogger, logger } = require('./src/utils/logger.js');  // Importar correctamente addLogger y logger
+const config = require('./src/config/config.js');
 const websocket = require('./websocket.js');
 const cartsRouter = require('./src/routes/cartsRouter.js');
 const productsRouter = require('./src/routes/productsRouter.js');
@@ -25,7 +26,7 @@ const PORT = 8080;
 
 app.use(session({
     store: mongoStore.create({
-        mongoUrl: mongoUrl ,
+        mongoUrl: mongoUrl,
         ttl: 20
     }),
     secret: 'secretPhrase',
@@ -33,54 +34,52 @@ app.use(session({
     saveUninitialized: false
 }));
 
-//Mongo atlas connect
+// Mongo atlas connect
 async function connectToDatabase() {
     try {
         await mongoose.connect(mongoUrl, {
-           
             dbName: 'Productos'
         });
-        console.log('Conexión a MongoDB Atlas establecida.');
+        logger.info('Conexión a MongoDB Atlas establecida.');
     } catch (error) {
-        console.error('Error al conectar a MongoDB Atlas:', error);
+        logger.fatal('Error al conectar a MongoDB Atlas:', error); // Usar logger.fatal para errores críticos
     }
 }
-
 
 connectToDatabase();
 
 initializatePassport();
 app.use(passport.initialize());
 app.use(passport.session());
-//handlebars
+
+// Handlebars
 const hbs = exphbs.create();
 app.engine('handlebars', hbs.engine);
 app.set('view engine', 'handlebars');
 app.set('views', path.join(__dirname, 'src', 'views'));
 
-//middlewares
+// Middlewares
+app.use(addLogger);  // Agregar el middleware addLogger
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(cookieParser());
 
-
-//router
-
+// Routers
 app.use('/api/sessions', sessionsRouter);
 app.use('/login', sessionsRouter);
 app.use('/', viewsRouter);
 app.use('/products', viewsRouter);
 app.use('/realTimeProducts', viewsRouter);
-app.use ('/mockingproducts',viewsRouter);
-app.use('/api/carts', cartsRouter);
+app.use('/mockingproducts', viewsRouter);
+app.use('/loggerTest', viewsRouter);
 app.use('/api/products', productsRouter);
+app.use('/api/cart', cartsRouter);
 
 app.use(errorHandler);
 
-
 const httpServer = app.listen(PORT, () => {
-    console.log(`Start server in PORT ${PORT}`);
+    logger.info(`Servidor escuchando en el puerto ${PORT}`);
 });
 
 const io = new Server(httpServer);

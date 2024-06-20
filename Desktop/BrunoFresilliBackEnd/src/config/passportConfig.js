@@ -115,7 +115,6 @@ const cookieExtractor = (req) => {
       },
       async (jwt_payload, done) => {
         try {
-            // Verifica que el payload contiene 'role'
             if (!jwt_payload.role) {
               throw new Error('Token payload does not contain role');
             }

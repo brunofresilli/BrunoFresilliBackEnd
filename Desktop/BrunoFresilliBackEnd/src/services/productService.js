@@ -1,32 +1,68 @@
-
 const ProductRepository = require('../repositories/productRepository');
 const ProductDTO = require('../dao/dto/productDTO.js');
+const logger = require('../utils/logger.js'); // Importa tu configuración de logger
 
 class ProductService {
     
     async getProducts() {
-        return await ProductRepository.getAllProducts();
+        try {
+            logger.info('Fetching all products from database');
+            return await ProductRepository.getAllProducts();
+        } catch (error) {
+            logger.error(`Error fetching products: ${error.message}`);
+            throw error; // Propaga el error para ser manejado por el controlador
+        }
     }
 
     async getProductById(productId) {
-        return await ProductRepository.getProductById(productId);
+        try {
+            logger.info(`Fetching product by ID: ${productId}`);
+            return await ProductRepository.getProductById(productId);
+        } catch (error) {
+            logger.error(`Error fetching product by ID ${productId}: ${error.message}`);
+            throw error;
+        }
     }
 
     async getProductByCode(code) {
-        return await ProductRepository.getProductByCode(code);
+        try {
+            logger.info(`Fetching product by code: ${code}`);
+            return await ProductRepository.getProductByCode(code);
+        } catch (error) {
+            logger.error(`Error fetching product by code ${code}: ${error.message}`);
+            throw error;
+        }
     }
 
     async addProduct(productData) {
-        const productDTO = new ProductDTO(productData);
-        return await ProductRepository.addProduct(productDTO);
+        try {
+            const productDTO = new ProductDTO(productData);
+            logger.info(`Adding new product: ${productDTO.name}`);
+            return await ProductRepository.addProduct(productDTO);
+        } catch (error) {
+            logger.error(`Error adding product: ${error.message}`);
+            throw error;
+        }
     }
 
     async updateProduct(productId, updatedProductData) {
-        await ProductRepository.updateProduct(productId, updatedProductData);
+        try {
+            logger.info(`Updating product with ID ${productId}`);
+            await ProductRepository.updateProduct(productId, updatedProductData);
+        } catch (error) {
+            logger.error(`Error updating product with ID ${productId}: ${error.message}`);
+            throw error;
+        }
     }
 
     async deleteProduct(productId) {
-        await ProductRepository.deleteProduct(productId);
+        try {
+            logger.info(`Deleting product with ID ${productId}`);
+            await ProductRepository.deleteProduct(productId);
+        } catch (error) {
+            logger.error(`Error deleting product with ID ${productId}: ${error.message}`);
+            throw error;
+        }
     }
 }
 

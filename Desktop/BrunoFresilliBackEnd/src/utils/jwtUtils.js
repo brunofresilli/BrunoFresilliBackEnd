@@ -7,6 +7,7 @@ const generateToken = (user) => {
         throw new Error('User role is not defined');
       }
     const payload = {
+        cart: user.cart,
         first_name: user.first_name,
         last_name: user.last_name,
         email: user.email,

@@ -42,7 +42,7 @@ productSchema.plugin(mongoosePaginate);
 const productModel = mongoose.model(productCollection, productSchema);
 
 function isValidProductData(productData) {
-    // Verificar que todos los campos requeridos estén presentes y tengan los tipos correctos
+  
     if (!productData ||
         typeof productData.title !== 'string' ||
         typeof productData.description !== 'string' ||
@@ -54,7 +54,6 @@ function isValidProductData(productData) {
         return false;
     }
 
-    // Puedes agregar validaciones adicionales según tus necesidades, como verificar la unicidad del código, etc.
 
     return true;
 }

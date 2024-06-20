@@ -1,11 +1,20 @@
 class CartDTO {
-    constructor({ id, products }) {
-        this.id = id;
-        this.products = products.map(product => ({
-            product: product.product,
-            quantity: product.quantity
-        }));
+    constructor(cart) {
+        this.id = cart.id;
+        if (Array.isArray(cart)) {
+          this.products = cart.map((product) => {
+            return {
+              id: product.product,
+              quantity: product.quantity,
+              title: product.title,
+              price: product.price,
+              thumbnail: product.thumbnail,
+            };
+          });
+        } else {
+          this.products = [];
+        }
+      }
     }
-}
 
 module.exports = CartDTO;

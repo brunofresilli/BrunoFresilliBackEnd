@@ -1,9 +1,10 @@
 const {Router} = require ('express');
 const passport = require ('passport');
 const { generateToken } = require('../utils/jwtUtils.js');
+const CartController = require('../controllers/cartController');
 
 
-
+const cartController = new CartController();
 const router = Router();
 
 
@@ -45,23 +46,36 @@ router.post("/login", (req, res, next) => {
 
 
 router.post("/register", (req, res, next) => {
-    passport.authenticate('register', async(err, user, info) => {
+    passport.authenticate('register', async (err, user, info) => {
         if (err) {
             console.error('Error durante el registro:', err);
             req.session.failRegister = true;
-            return res.redirect("/register"); 
+            return res.redirect("/register");
         }
         if (!user) {
             console.log('Registro fallido:', info.message);
             req.session.failRegister = true;
-            return res.redirect("/register"); 
+            return res.redirect("/register");
         }
         console.log('Registro exitoso!');
+
+        // Check if the user is an admin (optional step)
         if (user.email === 'adminCoder@coder.com') {
             user.role = 'admin';
             await user.save();
         }
-        res.redirect("/login"); 
+
+        // Create a cart for the user
+        try {
+            const cart = await cartController.createCart(); // Create a cart without passing req/res/next
+            user.cart = cart._id; // Associate the cart with the user
+            await user.save();
+            res.redirect("/login");
+        } catch (error) {
+            console.error('Error al crear carrito:', error);
+            req.session.failRegister = true;
+            return res.redirect("/register");
+        }
     })(req, res, next);
 });
 
