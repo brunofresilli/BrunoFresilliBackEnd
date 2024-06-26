@@ -13,13 +13,13 @@ class CartService {
         }
     }
 
-    async addProductToCart(cartid, productId, quantity) {
+    async addProductToCart(cartId, productId, quantity = 1) {
         try {
-            logger.info(`Agregando producto ${productId} al carrito ${cartid} con cantidad ${quantity}`);
-            return await CartRepository.addProductToCart(cartid, productId, quantity);
+            const cart = await CartRepository.addCart(cartId, productId, quantity);
+            return cart;
         } catch (error) {
-            logger.error('Error al agregar producto al carrito', { cartid, productId, quantity, error });
-            throw new Error('Error al agregar producto al carrito');
+            logger.error('Error adding product to cart', { cartId, productId, quantity, error });
+            throw new Error('Error adding product to cart');
         }
     }
 

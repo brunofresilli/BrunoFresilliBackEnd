@@ -1,8 +1,7 @@
 const cartService = require('../services/cartService');
-const CustomError = require('../services/errors/CustomError');
-const { ErrorCodes } = require('../services/errors/enums');
-const { generateCartErrorInfo } = require('../services/errors/info');
-const logger = require('../utils/logger');
+const CustomError = require('../services/errors/CustomError.js');
+const { ErrorCodes } = require('../services/errors/enums.js');
+const { logger } = require('../utils/logger.js');
 
 class CartController {
 
@@ -44,12 +43,12 @@ class CartController {
     }
 
     async addProductToCart(req, res, next) {
+        const  pid = req.params;
+        const  cid = req.params;
+        const  quantity  = req.body;
+
         try {
-            const cartId = req.params.id;
-            const { productId } = req.params;
-            const { quantity } = req.body || 1;
-            logger.info(`Adding product to cart`, { cartId, productId, quantity });
-            const updatedCart = await cartService.addProductToCart(cartId, productId, quantity);
+            const updatedCart = await cartService.addProductToCart(cid, pid, quantity || 1);
             res.status(200).json(updatedCart);
         } catch (error) {
             logger.error('Error adding product to cart', { error });
@@ -61,7 +60,6 @@ class CartController {
             }));
         }
     }
-
     async updateCart(req, res, next) {
         try {
             const cartId = req.params.id;

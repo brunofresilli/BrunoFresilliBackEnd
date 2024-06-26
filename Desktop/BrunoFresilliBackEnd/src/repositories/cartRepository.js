@@ -21,37 +21,26 @@ class CartRepository {
         }
     }
 
-    async addProductToCart(cartid, productId, quantity = 1) {
-        try {
-            const cart = await CartDAO.addCart(cartid);
-            if (!cart) {
-                throw new Error(`Cart with ID ${cartid} not found`);
-            }
+    
 
-            logger.info(`Adding product ${productId} to cart ${cartid} with quantity ${quantity}`);
-            logger.debug("Cart retrieved:", cart);
-
-            const existingProduct = cart.products.find(
-                (product) => product.product && product.product.toString() === productId.toString()
-            );
-
-            logger.debug("Existing product:", existingProduct);
-
-            if (existingProduct) {
-                existingProduct.quantity += quantity;
-            } else {
-                cart.products.push({ product: productId, quantity });
-            }
-
-            await cart.save();
-
-            logger.debug("Cart after update:", cart);
-
-            return cart;
-        } catch (error) {
-            logger.error(`Error adding product to cart: ${error.message}`);
-            throw new Error("Error adding product to cart");
+    async addCart(cartId, productId, quantity) {
+        const cart = await CartDAO.findOne({ _id: cartId });
+        if (!cart) {
+            throw new Error(`Cart with ID ${cartId} not found`);
         }
+
+        const existingProduct = cart.products.find(
+            (product) => product.product.toString() === productId.toString()
+        );
+
+        if (existingProduct) {
+            existingProduct.quantity += quantity;
+        } else {
+            cart.products.push({ product: productId, quantity });
+        }
+
+        await cart.save();
+        return cart;
     }
 
     async updateCart(cartId, products) {
