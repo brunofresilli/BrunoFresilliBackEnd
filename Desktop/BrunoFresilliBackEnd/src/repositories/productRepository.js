@@ -1,11 +1,13 @@
-const ProductDAO = require('../dao/productDAO.js');
-const ProductDTO = require('../dao/dto/productDTO.js');
-const logger = require('../utils/logger.js'); // Asegúrate de ajustar la ruta según la ubicación de tu configuración de logger
+const ProductDAO = require('../dao/productDAO');
+const Product = require('../dao/models/product.js');
+const logger = require('../utils/logger');
+const ProductDTO = require('../dao/dto/productDTO'); // Asegúrate de tener este archivo si es necesario
+
 
 class ProductRepository {
     async getAllProducts() {
         try {
-            const products = await ProductDAO.findAll();
+            const products = await Product.find().lean();
             return products.map(product => new ProductDTO(product));
         } catch (error) {
             logger.error(`Error fetching all products: ${error.message}`);
@@ -15,7 +17,7 @@ class ProductRepository {
 
     async getProductById(id) {
         try {
-            const product = await ProductDAO.findById(id);
+            const product = await Product.findById(id).lean();
             return product ? new ProductDTO(product) : null;
         } catch (error) {
             logger.error(`Error fetching product with ID ${id}: ${error.message}`);
@@ -59,6 +61,21 @@ class ProductRepository {
             logger.error(`Error deleting product with ID ${id}: ${error.message}`);
             throw new Error(`Error deleting product with ID ${id}`);
         }
+    }
+
+    async getById(id) {
+        try {
+            console.log('Buscando producto por ID:', id);
+            const product = await Product.findById(id).lean();
+            return product;
+        } catch (error) {
+            console.log(`Error buscando producto por ID ${id}: ${error.message}`);
+            throw new Error(`Error buscando producto por ID ${id}`);
+        }
+    }
+
+    async update(product) {
+        return product.save();
     }
 }
 

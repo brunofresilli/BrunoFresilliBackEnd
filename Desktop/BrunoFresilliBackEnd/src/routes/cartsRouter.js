@@ -1,11 +1,13 @@
 const { Router } = require('express');
 const passport = require('passport');
 const authorize = require('../middlewares/authJWT');
-const CartController = require('../controllers/cartController.js');
+const cartController = require('../controllers/cartController.js');
+const ticketController = require('../controllers/ticketController.js');
 const logger = require('../utils/logger');
 
+
 const router = Router();
-const cartController = new CartController();
+
 
 router.post('/', 
     passport.authenticate('jwt', { session: false }),
@@ -13,11 +15,6 @@ router.post('/',
     (req, res) => cartController.createCart(req, res)
 );
 
-router.get('/:cid', 
-    passport.authenticate('jwt', { session: false }),
-    authorize('user'),
-    (req, res) => cartController.getCartProducts(req, res)
-);
 
 router.post("/:cid/products/:pid", async (req, res) => {
     const cartId = req.params.cid;
@@ -67,10 +64,37 @@ router.delete('/:cid',
     (req, res) => cartController.deleteCart(req, res)
 );
 
-router.delete('/:cid/products/:productId', 
+router.delete('/:cid/products/:pid', 
     passport.authenticate('jwt', { session: false }),
     authorize('user'),
-    (req, res) => cartController.removeProductFromCart(req, res)
-);
-
+    async (req, res) => {
+      const cartId = req.params.cid;
+      const productId = req.params.pid;
+      try {
+        await cartController.deleteProductFromCart(cartId, productId);
+        res.send(`Product ${productId} has been deleted from the cart`);
+      } catch (error) {
+        console.error(error);
+        res.status(400).send({
+          status: "error",
+          error: "There was an error deleting the product from the cart",
+        });
+      }
+    });
+    
+    
+    router.post('/:cid/purchase', passport.authenticate('jwt', { session: false }), async (req, res) => {
+      try {
+        const cartId = req.params.cid;
+        const purchaser = req.user.email; 
+        const result = await cartController.finalizePurchase(cartId, purchaser);
+        console.log(result)
+    res.redirect(`/purchase/${result.ticket._id}`);
+      } catch (error) {
+        res.status(400).send({
+          status: 'error',
+          message: error.message,
+        });
+      }
+    });
 module.exports = router;

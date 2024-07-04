@@ -1,6 +1,6 @@
 const ProductRepository = require('../repositories/productRepository');
 const ProductDTO = require('../dao/dto/productDTO.js');
-const logger = require('../utils/logger.js'); // Importa tu configuración de logger
+const logger = require('../utils/logger.js'); 
 
 class ProductService {
     
@@ -10,7 +10,7 @@ class ProductService {
             return await ProductRepository.getAllProducts();
         } catch (error) {
             logger.error(`Error fetching products: ${error.message}`);
-            throw error; // Propaga el error para ser manejado por el controlador
+            throw error; 
         }
     }
 

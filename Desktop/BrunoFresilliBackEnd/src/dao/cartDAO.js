@@ -1,34 +1,59 @@
 const Cart = require('../dao/models/cart.js');
 
 class CartDAO {
-    async create() {
-        return await Cart.create({ products: [] });
-    }
+  async create() {
+    return await Cart.create({ products: [] });
+  }
 
-    async getCartById(cartId) {
-        return await Cart.findById(cartId).populate('products.product');
+  async getCartById(cartId) {
+    try {
+      console.log('DAO: getCartById called');
+      return await Cart.findById(cartId).populate('products.product').lean();
+    } catch (error) {
+      console.error('DAO error:', error.message);
+      throw new Error(`Error fetching cart with ID ${cartId}`);
     }
+  }
+
 
     async updateCart(cartId, products) {
-        return await Cart.findByIdAndUpdate(cartId, { products }, { new: true }).populate('products.product');
+        return await Cart.findByIdAndUpdate(cartId, { products }, { new: true }).populate('products.Product');
     }
 
     
-  async addCart(cartId, productId, quantity) {
-    const cart = await Cart.findOne({ _id: cartId });
-    if (!cart) throw new Error(`Cart with ID ${cartId} not found`);
-
-    const existingProduct = cart.products.find(
-      (product) => product.product.toString() === productId
-    );
-    if (existingProduct) {
-      existingProduct.quantity += quantity;
-    } else {
-      cart.products.push({ product: productId, quantity });
+    addCart = async (cartid) => {
+      try {
+        const cart = await Cart.findOne({ _id: cartid });
+        if (!cart) throw new Error(`Cart with ID ${cartid} not found`);
+    
+      
+        if (!Array.isArray(cart.products)) {
+          cart.products = [];
+        }
+    
+       
+        cart.products = cart.products.map(product => {
+          if (!product.product) {
+            return { product: product._id, quantity: product.quantity || 1 };
+          }
+          return product;
+        });
+    
+        return cart;
+      } catch (error) {
+        console.error('Error retrieving cart:', error.message);
+        throw error;
+      }
+    };
+    async delete(id) {
+      return await Cart.deleteOne({ _id: id });
     }
-
-    await cart.save();
-    return cart;
+  
+  async deleteProduct(cartId, productId) {
+    return await Cart.findOneAndUpdate(
+      { _id: cartId },
+      { $pull: { products: { product: productId } } }
+    );
   }
 }
 

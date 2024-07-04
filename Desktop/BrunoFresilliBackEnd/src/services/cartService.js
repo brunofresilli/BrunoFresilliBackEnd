@@ -1,38 +1,30 @@
 const CartRepository = require('../repositories/cartRepository');
-const logger = require('../utils/logger.js'); // Importar el logger configurado
+const logger = require('../utils/logger.js');
 
 class CartService {
     
+  
     async getCartProducts(cartId) {
         try {
-            const cart = await CartRepository.getCartById(cartId);
-            return cart ? cart.products : null;
+          console.log('Service: getCartProducts called');
+          const cart = await CartRepository.getCartById(cartId);
+          return cart ? cart.products : [];
         } catch (error) {
-            logger.error('Error al obtener productos del carrito', { cartId, error });
-            throw error; // Propagar el error para manejarlo en niveles superiores
+          console.error('Service error:', error.message);
+          throw new Error(`Products not found in cart ${cartId}`);
         }
-    }
-
-    async addProductToCart(cartId, productId, quantity = 1) {
-        try {
-            const cart = await CartRepository.addCart(cartId, productId, quantity);
-            return cart;
-        } catch (error) {
-            logger.error('Error adding product to cart', { cartId, productId, quantity, error });
-            throw new Error('Error adding product to cart');
-        }
-    }
+      }
+  async addProductToCart(cartid, productId, quantity) {
+    return await CartRepository.addProductToCart(
+      cartid,
+      productId,
+      quantity
+    );
+  }
 
     async createCart() {
-        try {
-            const newCart = await CartRepository.createCart();
-            logger.info('Carrito creado correctamente', { newCart });
-            return newCart;
-        } catch (error) {
-            logger.error('Error al crear carrito', { error });
-            throw new Error('Error al crear carrito');
-        }
-    }
+        return await CartRepository.createCart();
+      }
 
     async updateCart(cartId, products) {
         try {
@@ -67,33 +59,14 @@ class CartService {
         }
     }
 
-    async deleteCart(cartId) {
-        try {
-            const deletedCart = await CartRepository.deleteCart(cartId);
-            logger.info('Carrito eliminado correctamente', { cartId });
-            return deletedCart;
-        } catch (error) {
-            logger.error('Error al eliminar carrito', { cartId, error });
-            throw new Error('Error al eliminar carrito');
-        }
-    }
-
-    async removeProductFromCart(cartId, productId) {
-        try {
-            const cart = await CartRepository.getCartById(cartId);
-            if (!cart) {
-                return null;
-            }
-
-            cart.products = cart.products.filter(p => p.product._id.toString() !== productId);
-            const updatedCart = await CartRepository.updateCart(cart._id, cart.products);
-            logger.info('Producto eliminado del carrito correctamente', { cartId, productId });
-            return updatedCart;
-        } catch (error) {
-            logger.error('Error al eliminar producto del carrito', { cartId, productId, error });
-            throw new Error('Error al eliminar producto del carrito');
-        }
-    }
+   
+  async deleteCart(id) {
+    return await CartRepository.deleteCart(id);
 }
+async deleteProductFromCart(cartId, productId) {
+    return await CartRepository.deleteProductFromCart(cartId, productId);
+       
+        }
+    }
 
 module.exports = new CartService();

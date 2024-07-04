@@ -1,10 +1,10 @@
 const {Router} = require ('express');
 const passport = require ('passport');
 const { generateToken } = require('../utils/jwtUtils.js');
-const CartController = require('../controllers/cartController');
+const cartController = require('../controllers/cartController');
 
 
-const cartController = new CartController();
+
 const router = Router();
 
 
@@ -59,16 +59,17 @@ router.post("/register", (req, res, next) => {
         }
         console.log('Registro exitoso!');
 
-        // Check if the user is an admin (optional step)
+     
         if (user.email === 'adminCoder@coder.com') {
             user.role = 'admin';
             await user.save();
         }
 
-        // Create a cart for the user
+   
         try {
-            const cart = await cartController.createCart(); // Create a cart without passing req/res/next
-            user.cart = cart._id; // Associate the cart with the user
+            const cart = await cartController.createCart(); 
+            user.cart = cart._id,
+            console.log(user.cart);
             await user.save();
             res.redirect("/login");
         } catch (error) {

@@ -1,15 +1,38 @@
 .cards-container {
-    display: flex;
-    flex-wrap: wrap;
-  }
-  
-  .card {
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    margin: 10px;
-    width: calc(33.33% - 20px); 
-    box-sizing: border-box;
-  }
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+}
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  width: 100%;
+  max-width: 1200px;
+}
+
+.card {
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 15px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+}
+
+.button-addCart {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.button-addCart:hover {
+  background-color: #0056b3;
+}
   
   .card-info {
     padding: 15px;
@@ -70,14 +93,71 @@
     align-items: center; 
     
 }
+
 .button-container {
     text-align: center; 
     
     
 }
 
+.prev, .next, .goto-cart {
+  background-color: #007bff;
+  color: white;
+  text-decoration: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  display: inline-block;
+  margin: 10px 5px;
+  text-align: center;
+}
 
+.prev:hover, .next:hover, .goto-cart:hover {
+  background-color: #0056b3;
+}
+.pagination {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+  margin-top: 20px;
+}
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f4;
+  margin: 0;
+  padding: 0;
+}
 
-.delete-button:hover {
-    background-color: #c82333; 
+.purchase-container {
+  background-color: #fff;
+  margin: 50px auto;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  max-width: 600px;
+}
+
+h1, h2 {
+  color: #333;
+}
+
+p, li {
+  color: #555;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+li {
+  background-color: #f9f9f9;
+  margin: 10px 0;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+li strong {
+  display: block;
+  margin-bottom: 5px;
+  color: #000;
 }

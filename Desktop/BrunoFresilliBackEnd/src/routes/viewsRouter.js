@@ -2,9 +2,12 @@ const { Router } = require('express');
 const  { productModel } = require ('../dao/models/product.js')
 const authorize = require('../middlewares/authJWT.js');
 const ProductController = require('../controllers/productController');
+const cartController = require('../controllers/cartController');
 const { generateFakeProduct } = require('../utils/fakerUtil.js')
 const passport = require ('passport')
 const { logger } = require('../utils/logger.js');
+const Ticket = require ('../dao/models/ticket.js');
+
 
 
 
@@ -16,7 +19,7 @@ router.get("/products",
     passport.authenticate("jwt", { session: false }),
     authorize("user"),
     async (req, res) => {
-    //console.log('User JWT:', req.user)
+    
     
     let page = parseInt(req.query.page);
     if (!page) page = 1;
@@ -79,6 +82,35 @@ router.get('/realTimeProducts',
     }
 });
 
+
+router.get("/:cid",
+    passport.authenticate("jwt", { session: false }),
+   
+    async (req, res) => {
+      try {
+        
+        const result = await cartController.getCartProducts(req.params.cid);
+        console.log(result);
+        if (result && result.products.length > 0) {
+            result.products.forEach(product => {
+              product.totalValue = product.quantity * product.product.price;
+            });
+          }
+        
+        res.render('cart', {
+          title: 'Carrito de Compras',
+          style: 'style.css',
+          result ,
+          cartId:req.params.cid
+        });
+      } catch (error) {
+        res.status(400).send({
+          status: "error",
+          message: error.message,
+        });
+      }
+    }
+  );
 router.get("/unauthorized", (req, res) => {
     res.status(401).render("unauthorized", {
       title: "Unauthorized",
@@ -101,7 +133,6 @@ router.get('/mockingproducts', (req, res) => {
 });
 
 router.get('/loggerTest', (req, res) => {
-    // Registrar diferentes niveles de logs para probar
     logger.fatal('Este es un mensaje fatal');
     logger.error('Este es un mensaje de error');
     logger.warning('Este es un mensaje de advertencia');
@@ -112,11 +143,32 @@ router.get('/loggerTest', (req, res) => {
     res.send('Logs probados con éxito');
 });
 
-// POST /loggerTest
 router.post('/loggerTest', (req, res) => {
-    // Simular una operación de creación o actualización y registrar un mensaje de log
     logger.info('Se ha recibido una solicitud POST en /loggerTest');
     res.status(201).send('Solicitud POST procesada con éxito');
+});
+router.get('/purchase/:ticketId', async (req, res) => {
+  try {
+    const ticketId = req.params.ticketId;
+    const ticket = await Ticket.findById(ticketId).populate('products.product').lean();
+
+    if (!ticket) {
+      return res.status(404).send({
+        status: 'error',
+        message: 'Ticket not found',
+      });
+    }
+    
+    res.render('ticket', 
+      { ticket,
+         style: 'style.css' 
+        }); 
+  } catch (error) {
+    res.status(500).send({
+      status: 'error',
+      message: error.message,
+    });
+  }
 });
 
 module.exports = router;

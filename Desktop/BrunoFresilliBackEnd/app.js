@@ -59,7 +59,8 @@ app.set('view engine', 'handlebars');
 app.set('views', path.join(__dirname, 'src', 'views'));
 
 // Middlewares
-app.use(addLogger);  // Agregar el middleware addLogger
+
+app.use(addLogger); 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
@@ -70,6 +71,7 @@ app.use('/api/sessions', sessionsRouter);
 app.use('/login', sessionsRouter);
 app.use('/', viewsRouter);
 app.use('/products', viewsRouter);
+app.use('/cart',viewsRouter);
 app.use('/realTimeProducts', viewsRouter);
 app.use('/mockingproducts', viewsRouter);
 app.use('/loggerTest', viewsRouter);

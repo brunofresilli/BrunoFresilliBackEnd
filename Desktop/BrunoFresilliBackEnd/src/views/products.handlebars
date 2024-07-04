@@ -2,10 +2,13 @@
     <h1>Productoss</h1>
     <h2>Bienvenido {{username}}</h2>
     
-    
+      <div class="pagination">
+ 
+            <a href="/{{userId}}"class="goto-cart">ir al carrito</a>
+        </div>
     <div class="cards-container">
       {{#if result.isValid}}
-        <div>
+         <div class="cards-grid">
         {{#each result.docs}}
             <div class="card">
                 <h3>{{this.title}}</h3>
@@ -18,20 +21,19 @@
         {{/each}}
         </div>
         <hr>
+        <div class="pagination">
         <div>
             {{#if result.hasPrevPage}}
-                <a href="{{result.prevLink}}"><< Anterior</a>
+                <a href="{{result.prevLink}}"class="prev"><< Anterior</a>
             {{/if}}
         </div>
         <br>
         <div>
             {{#if result.hasNextPage}}
-                <a href="{{result.nextLink}}">Siguiente >></a>
+                <a href="{{result.nextLink}}" class="next">Siguiente >></a>
             {{/if}}
         </div>
-        <div>
-            <a href="/cart?cid={{../userId}}">ir al carrito</a>
-        </div>
+       </div>
     {{else}}
        <h2>No hay productos para mostrar</h2>
     {{/if}}

@@ -2,64 +2,46 @@ const cartService = require('../services/cartService');
 const CustomError = require('../services/errors/CustomError.js');
 const { ErrorCodes } = require('../services/errors/enums.js');
 const { logger } = require('../utils/logger.js');
+const Cart = require ('../dao/models/cart.js');
+const Ticket = require ('../dao/models/ticket.js');
+const crypto = require ('crypto');
+
+
 
 class CartController {
 
-    async createCart(req, res, next) {
+    async createCart() {
         try {
-            const newCart = await cartService.createCart();
-            logger.info('Cart created successfully', { cartId: newCart._id });
-            res.status(201).json(newCart);
+          const newCart = await cartService.createCart();
+          return newCart;
         } catch (error) {
-            logger.error('Error creating cart', { error });
-            next(CustomError.createError({
-                name: 'Database Error',
-                cause: error,
-                message: 'Error creating cart',
-                code: ErrorCodes.DATABASE_ERROR,
-            }));
+          console.error(error.message);
+          throw new Error("Error creating cart");
         }
-    }
+      }
 
-    async getCartProducts(req, res, next) {
+      async getCartProducts(cartId) {
         try {
-            const cartId = req.params.id;
-            const products = await cartService.getCartProducts(cartId);
-            if (!products) {
-                logger.warn(`Cart not found: ${cartId}`);
-                throw CustomError.createError({
-                    name: 'Cart Not Found',
-                    cause: `Cart with ID ${cartId} not found`,
-                    message: 'Cart not found',
-                    code: ErrorCodes.CART_OPERATION_ERROR,
-                });
-            }
-            logger.info('Products retrieved successfully', { cartId });
-            res.status(200).json(products);
+          console.log('Controller: getCartProducts called');
+          const products = await cartService.getCartProducts(cartId);
+          return { products: products || [] };
         } catch (error) {
-            logger.error('Error retrieving cart products', { error });
-            next(error);
+          logger.error('Controller error:', error.message);
+          throw new Error(`Products not found in cart ${cartId}`);
         }
+      }
+  async addProductToCart(cartId, productId, quantity = 1) {
+    try {
+      return await cartService.addProductToCart(
+        cartId,
+        productId,
+        quantity
+      );
+    } catch (error) {
+      console.error(error.message);
+      throw new Error("Error adding product to cart");
     }
-
-    async addProductToCart(req, res, next) {
-        const  pid = req.params;
-        const  cid = req.params;
-        const  quantity  = req.body;
-
-        try {
-            const updatedCart = await cartService.addProductToCart(cid, pid, quantity || 1);
-            res.status(200).json(updatedCart);
-        } catch (error) {
-            logger.error('Error adding product to cart', { error });
-            next(CustomError.createError({
-                name: 'Database Error',
-                cause: error,
-                message: 'Error adding product to cart',
-                code: ErrorCodes.DATABASE_ERROR,
-            }));
-        }
-    }
+  }
     async updateCart(req, res, next) {
         try {
             const cartId = req.params.id;
@@ -101,48 +83,79 @@ class CartController {
         }
     }
 
-    async deleteCart(req, res, next) {
-        try {
-            const cartId = req.params.id;
-            const result = await cartService.deleteCart(cartId);
-            if (!result) {
-                logger.warn(`Cart not found: ${cartId}`);
-                throw CustomError.createError({
-                    name: 'Cart Not Found',
-                    cause: `Cart with ID ${cartId} not found`,
-                    message: 'Cart not found',
-                    code: ErrorCodes.CART_OPERATION_ERROR,
-                });
-            }
-            logger.info('Cart deleted successfully', { cartId });
-            res.status(200).json({ message: 'Cart deleted successfully' });
-        } catch (error) {
-            logger.error('Error deleting cart', { error });
-            next(error);
-        }
+   
+  async deleteCart(id) {
+    try {
+      return await cartService.deleteCart(id);
+    } catch (error) {
+      console.error(error.message);
+      throw new Error("Error deleting cart");
     }
+  }
 
-    async removeProductFromCart(req, res, next) {
-        try {
-            const cartId = req.params.id;
-            const { productId } = req.params;
-            const result = await cartService.removeProductFromCart(cartId, productId);
-            if (!result) {
-                logger.warn(`Product not found in cart: ${cartId}, productId: ${productId}`);
-                throw CustomError.createError({
-                    name: 'Product Not Found in Cart',
-                    cause: `Product with ID ${productId} not found in cart`,
-                    message: 'Product not found in cart',
-                    code: ErrorCodes.CART_OPERATION_ERROR,
-                });
-            }
-            logger.info('Product removed from cart successfully', { cartId, productId });
-            res.status(200).json(result);
+        async deleteProductFromCart(cartId, productId) {
+            try {
+              return await cartService.deleteProductFromCart(cartId, productId);
         } catch (error) {
             logger.error('Error removing product from cart', { error });
             next(error);
         }
     }
-}
+    finalizePurchase = async (cartId, purchaser) => {
+      try {
+        
+        const cart = await Cart.findById(cartId).populate('products.product');
+        if (!cart) {
+          throw new Error('Cart not found');
+        }
+    
+        const productsNotPurchased = [];
+        const purchasedProducts = [];
+        let totalAmount = 0;
+    
+        for (const cartProduct of cart.products) {
+          const product = cartProduct.product;
+          const quantity = cartProduct.quantity;
+          if (product.stock >= quantity) {
+            product.stock -= quantity;
+            await product.save();
+            purchasedProducts.push({
+              product: product._id,
+              quantity,
+            });
+            totalAmount += product.price * quantity;
+          } else {
+            productsNotPurchased.push(product._id);
+          }
+        }
+    
+        // Genera un código único para el ticket
+        const ticketCode = crypto.randomBytes(16).toString('hex');
+    
+        // Genera un ticket para la compra
+        const ticket = await Ticket.create({
+          code: ticketCode,
+          products: purchasedProducts,
+          purchase_datetime: new Date(),
+          amount: totalAmount,
+          purchaser: purchaser,
+        });
+    
+        // Actualiza el carrito para contener solo los productos que no pudieron comprarse
+        cart.products = cart.products.filter(cartProduct => productsNotPurchased.includes(cartProduct.product._id));
+        await cart.save();
+    
+        return {
+          status: 'success',
+          message: 'Purchase completed',
+          ticket,
+          productsNotPurchased,
+        };
+      } catch (error) {
+        throw new Error('Error finalizing purchase: ' + error.message);
+      }
+    };
+    }
 
-module.exports = CartController;
+    
+module.exports = new CartController();
