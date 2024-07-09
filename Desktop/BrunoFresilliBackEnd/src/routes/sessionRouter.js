@@ -2,6 +2,8 @@ const {Router} = require ('express');
 const passport = require ('passport');
 const { generateToken } = require('../utils/jwtUtils.js');
 const cartController = require('../controllers/cartController');
+const { restoreRequest, restoreConfirm } = require('../controllers/sessionController.js');
+const User = require ('../dao/models/user.js');
 
 
 
@@ -94,6 +96,9 @@ router.get("/githubcallback", passport.authenticate('github', {failureRedirect: 
     req.session.user = req.user;
     res.redirect('/products');
 });
+
+router.post('/restore', restoreRequest);
+router.post('/restoreConfirm', restoreConfirm);
 
 
 

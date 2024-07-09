@@ -3,10 +3,16 @@ const router = express.Router();
 const productController = require('../controllers/productController');
 const  authorize  = require('../middlewares/authJWT.js');
 
-
-router.post('/realTimeProducts', authorize('admin'), async (req, res) => {
+router.post('/realTimeProducts', passport.authenticate("jwt", { session: false }), async (req, res) => {
     const productData = req.body;
     try {
+
+        const owner = req.user.role === 'premium' ? req.user.email : 'admin';
+
+        
+        productData.owner = owner;
+
+        
         const newProduct = await productController.addProduct(productData);
         res.status(201).json(newProduct);
     } catch (error) {
@@ -19,7 +25,6 @@ router.post('/realTimeProducts', authorize('admin'), async (req, res) => {
         }
     }
 });
-
 
 router.put('/:pid', authorize('admin'), async (req, res) => {
     const productId = req.params.pid;
@@ -41,10 +46,28 @@ router.put('/:pid', authorize('admin'), async (req, res) => {
 });
 
 
-router.delete('/:pid', authorize('admin'), async (req, res) => {
+router.delete('/:pid', passport.authenticate("jwt", { session: false }), async (req, res) => {
     const productId = req.params.pid;
     try {
+        
+        const isPremium = req.user.role === 'premium';
+        const userEmail = req.user.email;
+
+        
+        const product = await productController.getProductById(productId);
+
+     
+        if (!product) {
+            return res.status(404).json({ error: 'Producto no encontrado' });
+        }
+
+        if (isPremium && product.owner !== userEmail) {
+            return res.status(403).json({ error: 'No tienes permisos para eliminar este producto' });
+        }
+
         const deletedProduct = await productController.deleteProduct(productId);
+
+
         if (!deletedProduct) {
             res.status(404).json({ error: 'Producto no encontrado' });
         } else {

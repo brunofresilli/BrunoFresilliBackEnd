@@ -7,17 +7,31 @@ const { generateFakeProduct } = require('../utils/fakerUtil.js')
 const passport = require ('passport')
 const { logger } = require('../utils/logger.js');
 const Ticket = require ('../dao/models/ticket.js');
-
-
+const { verifyToken } = require ('../utils/jwtUtils.js');
+const User = require ('../dao/models/user.js');
 
 
 
 
 const router = Router();
 
+
+router.get('/restore', (req, res) => {
+  res.render('restore', {
+    title: 'Restaurar Contraseña',
+    style: 'style.css'
+  });
+});
+
+router.get('/restoreConfirm', verifyToken, (req, res) => {
+  const { access_token } = req.query;
+  console.log("access_token de la query:" ,access_token);
+  res.render('restoreConfirm', { access_token });
+});
+
 router.get("/products",   
     passport.authenticate("jwt", { session: false }),
-    authorize("user"),
+    authorize("user","premium"),
     async (req, res) => {
     
     
@@ -50,7 +64,7 @@ router.get("/login", (req, res) => {
         {
             title: 'login',
             style: 'style.css',
-            failLogin: req.session.failLogin ?? false
+          
         }
     )
 });
@@ -68,7 +82,7 @@ router.get("/register", (req, res) => {
 
 router.get('/realTimeProducts',
     passport.authenticate("jwt", { session: false }),
-    authorize("admin"), async (req, res) => {
+    authorize("admin","premium"), async (req, res) => {
     try {
         const products = await ProductController.getProducts(req, res);
         res.render('realTimeProducts', {
@@ -81,6 +95,27 @@ router.get('/realTimeProducts',
         res.status(500).send('Error al obtener productos en tiempo real');
     }
 });
+
+router.get('/user/:uid',passport.authenticate("jwt", { session: false }),
+authorize("admin"), async (req, res) => {
+  try {
+      const user = await User.findById(req.params.uid).lean();
+      console.log("change: ",user);
+      if (!user) {
+          return res.status(404).json({ message: 'User not found' });
+      }
+      res.render('changeRole',  {
+        title: 'changeRole',
+        style: 'style.css',
+        _id: user._id,
+        email: user.email,
+        role: user.role
+      }  );
+  } catch (err) {
+      res.status(500).json({ message: err.message });
+  }
+});
+
 
 
 router.get("/:cid",
@@ -170,5 +205,6 @@ router.get('/purchase/:ticketId', async (req, res) => {
     });
   }
 });
+
 
 module.exports = router;

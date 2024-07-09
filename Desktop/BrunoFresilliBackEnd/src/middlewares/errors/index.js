@@ -20,7 +20,6 @@ module.exports = (error, req, res, next) => {
       res.status(400).send({ status: "error", error: "Cart operation error" });
       break;
     default:
-      // Para errores no manejados específicamente
       res.status(500).send({ status: "error", error: "Unhandled error" });
   }
 };

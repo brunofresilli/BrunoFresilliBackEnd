@@ -128,11 +128,10 @@ class CartController {
             productsNotPurchased.push(product._id);
           }
         }
-    
-        // Genera un código único para el ticket
+
         const ticketCode = crypto.randomBytes(16).toString('hex');
     
-        // Genera un ticket para la compra
+
         const ticket = await Ticket.create({
           code: ticketCode,
           products: purchasedProducts,
@@ -140,8 +139,7 @@ class CartController {
           amount: totalAmount,
           purchaser: purchaser,
         });
-    
-        // Actualiza el carrito para contener solo los productos que no pudieron comprarse
+
         cart.products = cart.products.filter(cartProduct => productsNotPurchased.includes(cartProduct.product._id));
         await cart.save();
     

@@ -3,6 +3,7 @@ const passport = require('passport');
 const authorize = require('../middlewares/authJWT');
 const cartController = require('../controllers/cartController.js');
 const ticketController = require('../controllers/ticketController.js');
+const productController = require('../controllers/productController.js');
 const logger = require('../utils/logger');
 
 
@@ -11,18 +12,33 @@ const router = Router();
 
 router.post('/', 
     passport.authenticate('jwt', { session: false }),
-    authorize('user'),
+    authorize('user','premium'),
     (req, res) => cartController.createCart(req, res)
 );
 
-
-router.post("/:cid/products/:pid", async (req, res) => {
+router.post("/:cid/products/:pid", 
+  passport.authenticate('jwt', { session: false }),
+    authorize('user','premium'),
+  async (req, res) => {
     const cartId = req.params.cid;
     const productId = req.params.pid;
     const quantity = req.body.quantity || 1;
-  
+
     try {
+  
+      const isPremium = req.user.role === 'premium';
+      const userEmail = req.user.email;
+
+      const product = await productController.getProductById(productId);
+
+
+      if (product && isPremium && product.owner === userEmail) {
+        return res.status(403).json({ error: 'No puedes agregar a tu carrito un producto que te pertenece' });
+      }
+
+
       await cartController.addProductToCart(cartId, productId, quantity);
+
       res.send({
         status: "success",
         message: "Product has been added successfully",
@@ -35,14 +51,15 @@ router.post("/:cid/products/:pid", async (req, res) => {
       });
     }
   });
-
 router.put('/:cid', 
     passport.authenticate('jwt', { session: false }),
-    authorize('user'),
+    authorize('user','premium'),
     (req, res) => cartController.updateCart(req, res)
 );
 
-router.put("/:cid/products/:pid", async (req, res) => {
+router.put("/:cid/products/:pid", 
+  passport.authenticate('jwt', { session: false }),
+  authorize('user','premium'), async (req, res) => {
     const cartId = req.params.cid;
     const productId = req.params.pid;
     const quantity = req.body.quantity;
@@ -60,13 +77,13 @@ router.put("/:cid/products/:pid", async (req, res) => {
 
 router.delete('/:cid', 
     passport.authenticate('jwt', { session: false }),
-    authorize('user'),
+    authorize('user', 'premium'),
     (req, res) => cartController.deleteCart(req, res)
 );
 
 router.delete('/:cid/products/:pid', 
     passport.authenticate('jwt', { session: false }),
-    authorize('user'),
+    authorize('user','premium'),
     async (req, res) => {
       const cartId = req.params.cid;
       const productId = req.params.pid;

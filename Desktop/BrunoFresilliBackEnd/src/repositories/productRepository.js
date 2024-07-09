@@ -1,8 +1,7 @@
 const ProductDAO = require('../dao/productDAO');
 const Product = require('../dao/models/product.js');
 const logger = require('../utils/logger');
-const ProductDTO = require('../dao/dto/productDTO'); // Asegúrate de tener este archivo si es necesario
-
+const ProductDTO = require('../dao/dto/productDTO');
 
 class ProductRepository {
     async getAllProducts() {
