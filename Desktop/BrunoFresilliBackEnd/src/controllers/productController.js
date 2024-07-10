@@ -22,26 +22,14 @@ class ProductController {
         }
     }
 
-    async getProductById(req, res, next) {
+    async getProductById(pid) {
         try {
-            const productId = req.params.id;
-            const product = await productService.getProductById(productId);
-            if (!product) {
-                logger.warn(`Producto no encontrado: ${productId}`);
-                throw CustomError.createError({
-                    name: 'Product Not Found',
-                    cause: `Producto con ID ${productId} no encontrado`,
-                    message: 'Producto no encontrado',
-                    code: ErrorCodes.PRODUCT_NOT_FOUND,
-                });
-            }
-            logger.info('Producto obtenido correctamente', { productId });
-            res.status(200).json(product);
+          return await productService.getProductById(pid);
         } catch (error) {
-            logger.error('Error al obtener producto por ID', { error });
-            next(error);
+          console.error(error.message);
+          throw new Error("Error fetching product");
         }
-    }
+      }
 
     async getProductByCode(req, res, next) {
         try {

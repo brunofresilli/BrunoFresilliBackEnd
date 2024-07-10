@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const productController = require('../controllers/productController');
 const  authorize  = require('../middlewares/authJWT.js');
+const passport = require('passport');
 
 router.post('/realTimeProducts', passport.authenticate("jwt", { session: false }), async (req, res) => {
     const productData = req.body;

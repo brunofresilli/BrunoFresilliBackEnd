@@ -35,7 +35,7 @@ router.post("/:cid/products/:pid",
       if (product && isPremium && product.owner === userEmail) {
         return res.status(403).json({ error: 'No puedes agregar a tu carrito un producto que te pertenece' });
       }
-
+        
 
       await cartController.addProductToCart(cartId, productId, quantity);
 

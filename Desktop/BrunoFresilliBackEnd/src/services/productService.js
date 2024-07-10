@@ -14,15 +14,9 @@ class ProductService {
         }
     }
 
-    async getProductById(productId) {
-        try {
-            logger.info(`Fetching product by ID: ${productId}`);
-            return await ProductRepository.getProductById(productId);
-        } catch (error) {
-            logger.error(`Error fetching product by ID ${productId}: ${error.message}`);
-            throw error;
-        }
-    }
+    async getProductById(pid) {
+        return await ProductRepository.getProductByID(pid);
+      }
 
     async getProductByCode(code) {
         try {

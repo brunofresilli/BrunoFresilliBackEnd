@@ -5,12 +5,11 @@ const userModel = require('../dao/models/user.js');
 const  { createHash, isValidPassword }  = require ('../utils/functionsUtils.js')
 const { ExtractJwt } = require ('passport-jwt');
 const jwt = require ('passport-jwt');
+require('dotenv').config()
 
 const localStratergy = local.Strategy;
 const initializePassport = () => {
-    const CLIENT_ID = "Iv1.474deadc803b08da";
-    const SECRET_ID = "cb9365cd3ebee378af6065c93653f448c1412c92";
-    const CALLBACK_URL = 'http://localhost:8080/api/sessions/githubcallback'
+   
 
     passport.use('register', new localStratergy(
         {
@@ -63,9 +62,9 @@ const initializePassport = () => {
 
     passport.use('github', new GitHubStrategy({
         
-        clientID: CLIENT_ID,
-        clientSecret: SECRET_ID,
-        callbackURL: CALLBACK_URL
+        clientID: process.env.CLIENT_ID,
+        clientSecret: process.env.SECRET_ID,
+        callbackURL: process.env.CALLBACK_URL
     }, async (accessToken, refreshToken, profile, done) => {
         try {
             console.log(profile); 
@@ -104,7 +103,7 @@ const cookieExtractor = (req) => {
     }
     return token;
   };
-  const JWT_SECRET = "1234"
+  const JWT_SECRET = process.env.JWT_SECRET
 
   passport.use(
     "jwt",

@@ -2,12 +2,13 @@ const { Resend } = require('resend');
 const  User  = require('../dao/models/user.js');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
+require('dotenv').config();
 
 const { createHash, createToken , passwordValidation } = require('../utils/jwtUtils.js');
 
 const restoreRequest = async (req, res) => {
 
-    const resend = new Resend("re_B6pe3J3S_5hEfx7n1VC8kSGmZKrCQAxRn");
+    const resend = new Resend(process.env.resend);
 
     const email = req.body.email;
     const user = await User.findOne({ email });
@@ -27,7 +28,7 @@ const restoreRequest = async (req, res) => {
                 <h2>Restablecimiento de contraseña de cuenta</h2>
                 <p><b>Atención!</b>: si usted NO ha solicitado este mail, simplemente ignórelo</p>
                 <p>Para generar una nueva clave en su cuenta, ingrese por favor al siguiente enlace:</p>
-                <p><a href="http://localhost:8080/api/sessions/restoreConfirm?access_token=${token}">Restablecer contraseña</a></p>
+                <p><a href="http://localhost:8080/restoreConfirm?access_token=${token}">Restablecer contraseña</a></p>
             `,
         });
 
@@ -53,7 +54,7 @@ const restoreConfirm = async (req, res) => {
                 return res.status(400).send({ status: "error", message: "El token JWT proporcionado no es válido" });
             }
     
-            const JWT_SECRET = '1234'; 
+            const JWT_SECRET = process.env.JWT_SECRET; 
             const decoded = jwt.verify(access_token, JWT_SECRET); 
     
     

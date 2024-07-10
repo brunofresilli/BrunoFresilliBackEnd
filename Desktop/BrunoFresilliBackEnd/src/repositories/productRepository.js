@@ -14,15 +14,16 @@ class ProductRepository {
         }
     }
 
-    async getProductById(id) {
+    async getProductByID(pid) {
         try {
-            const product = await Product.findById(id).lean();
-            return product ? new ProductDTO(product) : null;
+          const product = await ProductDAO.findById(pid);
+          if (!product) throw new Error(`Product with ID ${pid} does not exist!`);
+          return product;
         } catch (error) {
-            logger.error(`Error fetching product with ID ${id}: ${error.message}`);
-            throw new Error(`Error fetching product with ID ${id}`);
+          throw new Error("Error fetching product: " + error.message);
         }
-    }
+      }
+    
 
     async getProductByCode(code) {
         try {

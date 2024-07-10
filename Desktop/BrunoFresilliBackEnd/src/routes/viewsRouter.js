@@ -54,7 +54,7 @@ router.get("/products",
     });
 });
 
-module.exports = router;
+
 
 
 
