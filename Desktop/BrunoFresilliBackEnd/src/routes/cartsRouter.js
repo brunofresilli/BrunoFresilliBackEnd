@@ -2,7 +2,6 @@ const { Router } = require('express');
 const passport = require('passport');
 const authorize = require('../middlewares/authJWT');
 const cartController = require('../controllers/cartController.js');
-const ticketController = require('../controllers/ticketController.js');
 const productController = require('../controllers/productController.js');
 const logger = require('../utils/logger');
 
