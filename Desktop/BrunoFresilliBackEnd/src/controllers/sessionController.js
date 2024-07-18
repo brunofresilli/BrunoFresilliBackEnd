@@ -3,8 +3,7 @@ const  User  = require('../dao/models/user.js');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 require('dotenv').config();
-
-const { createHash, createToken , passwordValidation } = require('../utils/jwtUtils.js');
+const  { createToken } = require('../utils/jwtUtils.js');
 
 const restoreRequest = async (req, res) => {
 

@@ -14,9 +14,7 @@ class ProductDAO {
     }
 
     async create(productData) {
-        const newProduct = new Product(productData);
-        await newProduct.save();
-        return newProduct;
+        return productModel.create(productData)
     }
 
     async update(id, updatedProductData) {
