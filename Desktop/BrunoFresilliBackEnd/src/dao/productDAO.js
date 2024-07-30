@@ -22,7 +22,7 @@ class ProductDAO {
     }
 
     async delete(id) {
-        await productModel.findByIdAndDelete(id).exec();
+        await productModel.deleteOne(id);
         return true;
     }
 }

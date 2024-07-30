@@ -6,7 +6,7 @@ const ProductDTO = require('../dao/dto/productDTO');
 class ProductRepository {
     async getAllProducts() {
         try {
-            const products = await Product.find().lean();
+            const products = await ProductDAO.findAll();
             return products.map(product => new ProductDTO(product));
         } catch (error) {
             logger.error(`Error fetching all products: ${error.message}`);

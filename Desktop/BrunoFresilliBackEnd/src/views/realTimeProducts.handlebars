@@ -1,18 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lista de Productos en Tiempo Real</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="cards-container" id="cards-container">
+    {{#if result.isValid}}
+      <div class="cards-grid" id="product-list">
+        {{#each result.docs}}
+          <div class="card" data-product-id="{{this._id}}">
+            <h3>{{this.title}}</h3>
+            <hr>
+            <p>Categoría: {{this.category}}</p>
+            <p>Descripción: {{this.description}}</p>
+            <p>Precio: $ {{this.price}}</p>
+            <button class="delete-button" data-product-id="{{this._id}}">Eliminar producto</button>
+          </div>
+        {{/each}}
+      </div>
+      <hr>
+      <div class="pagination">
+        {{#if result.hasPrevPage}}
+          <a href="{{result.prevLink}}" class="prev"><< Anterior</a>
+        {{/if}}
+        {{#if result.hasNextPage}}
+          <a href="{{result.nextLink}}" class="next">Siguiente >></a>
+        {{/if}}
+      </div>
+    {{else}}
+      <h2>No hay productos para mostrar</h2>
+    {{/if}}
+  </div>
 
   <h1>Agregar Nuevo Producto</h1>
-
   <form id="formAgregarProducto">
     <div>
       <label for="title">Nombre:</label>
       <input type="text" id="title" name="title" required>
     </div>
     <div>
-      <label for="code">Código:</label>
-      <input type="text" id="code" name="code" required>
-    </div>
-    <div>
       <label for="description">Descripción:</label>
       <textarea id="description" name="description" required></textarea>
+    </div>
+    <div>
+      <label for="code">Código:</label>
+      <input type="text" id="code" name="code" required>
     </div>
     <div>
       <label for="price">Precio:</label>
@@ -26,25 +61,10 @@
       <label for="category">Categoría:</label>
       <input type="text" id="category" name="category" required>
     </div>
-    <button id="button-create" onclick="createProduct(event)">Agregar Producto</button>
-  </form>
-
- <hr>
-
-    <div class="cards-container">
-        {{#each products}}
-            <div class="card">
-                <h3>{{this.title}}</h3>
-                <hr>
-                <p>Categoria: {{this.category}}</p>
-                <p>Descripción: {{this.description}}</p>
-                <p>Precio: $ {{this.price}}</p>
-                <button id="button-delete" onclick="deleteProduct({{this.id}})">Eliminar</button>
-            </div>
-        {{/each}}
-    </div>
-</div>
-  <script src="/socket.io/socket.io.js"></script>
-  
-  <script src="/js/index.js"></script>
+   <button id="button-create" onclick="createProduct(event)">Crear</button>
+      </form>
     
+  
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/js/realtimeproducts.js"></script>

@@ -23,7 +23,14 @@ const userSchema = new mongoose.Schema({
     cart: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Cart'
+    },
+    documents: { 
+        type: [{ name: String, reference: String }]
+    },
+    last_connection: { 
+        type: Date 
     }
+
 });
 
 const User = mongoose.model('User', userSchema);

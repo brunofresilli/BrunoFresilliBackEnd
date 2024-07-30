@@ -1,39 +1,38 @@
-<div class="box">
+ <div class="login-container">
     <h1>Login</h1>
     <hr>
 
-    <form class="box" method="post" action="/api/sessions/login">
+    <form class="login-form" method="post" action="/api/sessions/login">
+      <div class="form-group">
+        <label for="email">Email:</label>
+        <input type="email" name="email" id="email" required>
+      </div>
 
-        <label for="email">Email</label>
-        <input type="email" name="email" id="email">
+      <div class="form-group">
+        <label for="password">Password:</label>
+        <input type="password" name="password" id="password" required>
+      </div>
 
-        <label for="password">Password</label>
-        <input type="password" name="password" id="password">
-
-        <button type="submit">Login</button>
+      <button type="submit" class="submit-btn">Login</button>
     </form>
-     <span>
-        <a href="/api/sessions/github">
-            <button>Entrar con Github</button>
-        </a>
-    </span>
-      <span>
-        <a href="/restore">
-            <button>Olvide mi contraseña</button>
-        </a>
-    </span>
-    <br>
-    <span><a href="/register" target="_self">Register</a></span>
-</div>
 
-{{#if failLogin}}
-    <script type="text/javascript">
-        alert('Login Failed!');
-    </script>
-{{/if}}
-{{#if registerSuccess}}
-    <script type="text/javascript">
-        alert('Register Success!');
-    </script>
-{{/if}}
+    <div class="auth-links">
+      <a href="/api/sessions/github" class="auth-btn">Entrar con Github</a>
+      <a href="/restore" class="auth-btn">Olvidé mi contraseña</a>
+    </div>
 
+    <div class="register-link">
+      <a href="/register">No tienes una cuenta? Regístrate aquí</a>
+    </div>
+  </div>
+
+  {{#if failLogin}}
+    <script type="text/javascript">
+      alert('Login Failed!');
+    </script>
+  {{/if}}
+  {{#if registerSuccess}}
+    <script type="text/javascript">
+      alert('Register Success!');
+    </script>
+  {{/if}}

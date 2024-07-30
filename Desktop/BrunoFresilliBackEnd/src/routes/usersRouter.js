@@ -1,26 +1,91 @@
+
 const User = require ('../dao/models/user.js');
 const passport = require ('passport')
 const authorize = require('../middlewares/authJWT.js');
 const { Router } = require('express');
-
+const upload = require('../middlewares/multerConfig.js');
 const router = Router();
 
-
-router.patch('/premium/:uid',passport.authenticate("jwt", { session: false }),
-authorize("admin"), async (req, res) => {
+router.patch('/premium/:uid', passport.authenticate("jwt", { session: false }), authorize("admin"), async (req, res) => {
   try {
       const user = await User.findById(req.params.uid);
       if (!user) {
           return res.status(404).json({ message: 'User not found' });
       }
 
-      user.role = user.role === 'premium' ? 'user' : 'premium';
+      // Obtén el nuevo rol desde el cuerpo de la solicitud
+      const newRole = req.body.role;
+
+      if (newRole === 'premium') {
+          if (user.documents.length < 3) {
+              return res.status(400).json({ message: 'User must have at least 3 documents to become premium' });
+          }
+      }
+
+      user.role = newRole;
       await user.save();
       res.status(200).json({ message: 'User role updated', user });
   } catch (err) {
       res.status(500).json({ message: err.message });
   }
 });
+  
+ 
+  router.post('/:uid/documents', upload.fields([
+    { name: 'profile', maxCount: 1 },
+    { name: 'product', maxCount: 1 },
+    { name: 'document', maxCount: 10 }
+  ]), async (req, res) => {
+    try {
+      const userId = req.params.uid;
+      console.log('UserId:', userId);
 
+  
+      const files = req.files;
+      if (!files || !files.document) {
+        return res.status(400).json({ message: 'No se subieron archivos de documentos' });
+      }
+  
+      // Obtener el usuario
+      const user = await User.findById(userId);
+      console.log("Usuario:", user);
+      if (!user) {
+        return res.status(404).json({ message: 'Usuario no encontrado' });
+      }
+  
+      const documentEntries = [];
 
+      if (files.profile) {
+        documentEntries.push(...files.profile.map(file => ({
+          name: file.originalname,
+          reference: `/uploads/profiles/${file.filename}`
+        })));
+      }
+  
+      if (files.product) {
+        documentEntries.push(...files.product.map(file => ({
+          name: file.originalname,
+          reference: `/uploads/products/${file.filename}`
+        })));
+      }
+  
+      if (files.document) {
+        documentEntries.push(...files.document.map(file => ({
+          name: file.originalname,
+          reference: `/uploads/documents/${file.filename}`
+        })));
+      }
+  
+      // Actualizar la lista de documentos del usuario
+      user.documents = [...user.documents, ...documentEntries];
+      await user.save();
+  
+  
+      res.status(200).json({ message: 'Archivos subidos y datos guardados en la base de datos', files });
+    } catch (error) {
+      console.error('Error en el servidor:', error);
+      res.status(500).json({ message: 'Error al subir archivos', error });
+    }
+  });
+  
 module.exports = router;

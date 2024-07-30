@@ -68,6 +68,9 @@ const swaggerOptions = {
 };
 const specs = swaggerJsdoc(swaggerOptions);
 
+app.use(express.static(path.join(__dirname, 'public')));
+app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
+
 
 // Handlebars
 const hbs = exphbs.create();

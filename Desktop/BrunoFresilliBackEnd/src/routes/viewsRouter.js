@@ -83,18 +83,22 @@ router.get("/register", (req, res) => {
 router.get('/realTimeProducts',
     passport.authenticate("jwt", { session: false }),
     authorize("admin","premium"), async (req, res) => {
-    try {
-        const products = await ProductController.getProducts(req, res);
+   
+      let page = parseInt(req.query.page);
+      if (!page) page = 1;
+  
+      const result = await productModel.paginate({}, { page, limit: 5, lean: true });
+      const baseURL = "http://localhost:8080/realTimeProducts/";
+      result.prevLink = result.hasPrevPage ? `${baseURL}?page=${result.prevPage}` : "";
+      result.nextLink = result.hasNextPage ? `${baseURL}?page=${result.nextPage}` : "";
+      result.isValid = !(page <= 0 || page > result.totalPages);
+  
         res.render('realTimeProducts', {
             title: 'realTimeProducts',
             style: 'style.css',
-            products: products
+            result
         });
-    } catch (error) {
-        console.error(error);
-        res.status(500).send('Error al obtener productos en tiempo real');
-    }
-});
+      })
 
 router.get('/user/:uid',passport.authenticate("jwt", { session: false }),
 authorize("admin"), async (req, res) => {
@@ -206,5 +210,13 @@ router.get('/purchase/:ticketId', async (req, res) => {
   }
 });
 
+router.get('/:uid/upload', async (req, res) => {
+  const userId = req.params.uid;
+  res.render('upload', 
+    { userId ,
+      title: 'upload',
+      style: 'style.css',
+  });
+});
 
 module.exports = router;
