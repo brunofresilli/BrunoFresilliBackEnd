@@ -62,9 +62,9 @@ const passport = require('passport');
   
       socket.on("logoutUser", async () => {
         try {
-          // Handle logout logic
+          
         } catch (error) {
-          // Handle errors
+         
         }
       });
   

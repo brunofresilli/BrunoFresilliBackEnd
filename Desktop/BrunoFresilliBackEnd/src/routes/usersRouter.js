@@ -13,7 +13,7 @@ router.patch('/premium/:uid', passport.authenticate("jwt", { session: false }), 
           return res.status(404).json({ message: 'User not found' });
       }
 
-      // Obtén el nuevo rol desde el cuerpo de la solicitud
+     
       const newRole = req.body.role;
 
       if (newRole === 'premium') {
@@ -46,7 +46,7 @@ router.patch('/premium/:uid', passport.authenticate("jwt", { session: false }), 
         return res.status(400).json({ message: 'No se subieron archivos de documentos' });
       }
   
-      // Obtener el usuario
+     
       const user = await User.findById(userId);
       console.log("Usuario:", user);
       if (!user) {
@@ -76,7 +76,7 @@ router.patch('/premium/:uid', passport.authenticate("jwt", { session: false }), 
         })));
       }
   
-      // Actualizar la lista de documentos del usuario
+     
       user.documents = [...user.documents, ...documentEntries];
       await user.save();
   

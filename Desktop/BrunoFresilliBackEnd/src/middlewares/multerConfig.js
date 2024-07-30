@@ -3,7 +3,7 @@ const path = require('path');
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-      let folder = 'documents'; // default folder
+      let folder = 'documents'; 
       if (file.fieldname === 'profile') {
         folder = 'profiles';
       } else if (file.fieldname === 'product') {
