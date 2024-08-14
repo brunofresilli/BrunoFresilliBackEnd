@@ -101,16 +101,39 @@ router.delete('/:cid/products/:pid',
     
     router.post('/:cid/purchase', passport.authenticate('jwt', { session: false }), async (req, res) => {
       try {
-        const cartId = req.params.cid;
-        const purchaser = req.user.email; 
-        const result = await cartController.finalizePurchase(cartId, purchaser);
-        console.log(result)
-    res.redirect(`/purchase/${result.ticket._id}`);
+          const cartId = req.params.cid;
+          const purchaser = req.user.email;
+  
+          
+          const cart = await cartController.getCartProducts(cartId);
+  
+          
+          if (!cart.products || cart.products.length === 0) {
+              return res.status(400).send({
+                  status: 'error',
+                  message: 'El carrito está vacío, no se puede generar un ticket.',
+              });
+          }
+  
+          
+          for (const item of cart.products) {
+              const product = await productController.getProductById(item.product._id);
+              if (product.stock < item.quantity) {
+                  return res.status(400).send({
+                      status: 'error',
+                      message: `No hay suficiente stock para el producto: ${product.name}`,
+                  });
+              }
+          }
+  
+
+          const result = await cartController.finalizePurchase(cartId, purchaser);
+          res.redirect(`/purchase/${result.ticket._id}`);
       } catch (error) {
-        res.status(400).send({
-          status: 'error',
-          message: error.message,
-        });
+          res.status(400).send({
+              status: 'error',
+              message: error.message,
+          });
       }
-    });
+  });
 module.exports = router;

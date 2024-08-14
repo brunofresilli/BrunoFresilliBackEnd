@@ -100,25 +100,22 @@ router.get('/realTimeProducts',
         });
       })
 
-router.get('/user/:uid',passport.authenticate("jwt", { session: false }),
-authorize("admin"), async (req, res) => {
-  try {
-      const user = await User.findById(req.params.uid).lean();
-      console.log("change: ",user);
-      if (!user) {
-          return res.status(404).json({ message: 'User not found' });
-      }
-      res.render('changeRole',  {
-        title: 'changeRole',
-        style: 'style.css',
-        _id: user._id,
-        email: user.email,
-        role: user.role
-      }  );
-  } catch (err) {
-      res.status(500).json({ message: err.message });
-  }
-});
+      router.get('/users', passport.authenticate("jwt", { session: false }), authorize("admin"), async (req, res) => {
+        try {
+          const users = await User.find().lean();
+          console.log("All users: ", users);
+          if (!users || users.length === 0) {
+            return res.status(404).json({ message: 'No users found' });
+          }
+          res.render('usersList', {
+            title: 'Users List',
+            style: 'style.css',
+            users: users
+          });
+        } catch (err) {
+          res.status(500).json({ message: err.message });
+        }
+      });
 
 
 

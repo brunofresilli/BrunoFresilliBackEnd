@@ -17,24 +17,21 @@ router.post("/login", (req, res, next) => {
             return res.redirect('/login');
         }
         if (!user) {
-            console.log('Inicio de sesión fallido:', info.message);
+            console.log('Inicio de sesión fallido:', info ? info.message : 'No se proporcionó un mensaje de error.');
             req.session.failLogin = true;
             return res.redirect('/login');
         }
         
         try {
-            // Obtener el usuario desde la base de datos
             const dbUser = await User.findById(user._id);
             if (!dbUser) {
                 console.error('Usuario no encontrado en la base de datos');
                 return res.redirect('/login');
             }
 
-            // Actualizar el campo `last_connection`
             dbUser.last_connection = new Date();
-            await dbUser.save(); // Guarda el usuario actualizado
+            await dbUser.save(); 
             
-            // Iniciar sesión
             req.logIn(user, (err) => {
                 if (err) {
                     console.error('Error al iniciar sesión:', err);
@@ -44,32 +41,15 @@ router.post("/login", (req, res, next) => {
 
                 const token = generateToken(user);
                 res.cookie("access_token", token);
-                res.redirect("/products");
-                console.log('user :', user);
-
                 req.session.user = user;
                 req.session.loggedIn = true;
                 req.session.username = user.first_name;
+                res.redirect("/products");
             });
         } catch (saveError) {
             console.error('Error al actualizar el campo last_connection:', saveError);
-            // Aunque el campo last_connection no se actualice, proceder con el inicio de sesión
-            req.logIn(user, (err) => {
-                if (err) {
-                    console.error('Error al iniciar sesión:', err);
-                    req.session.failLogin = true;
-                    return res.redirect('/login');
-                }
-
-                const token = generateToken(user);
-                res.cookie("access_token", token);
-                res.redirect("/products");
-                console.log('user :', user);
-
-                req.session.user = user;
-                req.session.loggedIn = true;
-                req.session.username = user.first_name;
-            });
+            req.session.failLogin = true;
+            return res.redirect('/login');
         }
     })(req, res, next);
 });
