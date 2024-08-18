@@ -86,7 +86,7 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(cookieParser());
 
-// Routers
+// Routerss
 app.use('/api/sessions', sessionRouter); 
 app.use('/api/products', productsRouter);
 app.use('/api/cart', cartsRouter);
