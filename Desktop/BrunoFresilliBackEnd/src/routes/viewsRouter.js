@@ -79,26 +79,18 @@ router.get("/register", (req, res) => {
         }
     )
 });
+router.get('/productos/nuevo', 
+  passport.authenticate("jwt", { session: false }), 
+  authorize("admin", "premium"), 
+  (req, res) => {
+      res.render('newProducts', {
+          title: 'Cargar Nuevo Producto',
+          style: 'style.css',
+          username: req.user.username
+      });
+  }
+);
 
-router.get('/realTimeProducts',
-    passport.authenticate("jwt", { session: false }),
-    authorize("admin","premium"), async (req, res) => {
-   
-      let page = parseInt(req.query.page);
-      if (!page) page = 1;
-  
-      const result = await productModel.paginate({}, { page, limit: 5, lean: true });
-      const baseURL = "http://localhost:8080/realTimeProducts/";
-      result.prevLink = result.hasPrevPage ? `${baseURL}?page=${result.prevPage}` : "";
-      result.nextLink = result.hasNextPage ? `${baseURL}?page=${result.nextPage}` : "";
-      result.isValid = !(page <= 0 || page > result.totalPages);
-  
-        res.render('realTimeProducts', {
-            title: 'realTimeProducts',
-            style: 'style.css',
-            result
-        });
-      })
 
       router.get('/users', passport.authenticate("jwt", { session: false }), authorize("admin"), async (req, res) => {
         try {

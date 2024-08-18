@@ -1,33 +1,47 @@
 const express = require('express');
+const { productModel, isValidProductData } = require('../dao/models/product.js');
 const router = express.Router();
 const productController = require('../controllers/productController');
 const  authorize  = require('../middlewares/authJWT.js');
 const passport = require('passport');
 const nodemailer = require('nodemailer');
+router.post('/productos',
+    passport.authenticate("jwt", { session: false }),
+    authorize("admin", "premium"),
+    async (req, res) => {
+        try {
+            // Asegúrate de que esta lógica no dependa del carrito de compras
+            console.log('Datos recibidos:', req.body);
 
-router.post('/realTimeProducts', passport.authenticate("jwt", { session: false }), async (req, res) => {
-    const productData = req.body;
-    try {
+            const productData = {
+                title: req.body.title,
+                description: req.body.description,
+                code: req.body.code,
+                price: parseFloat(req.body.price),
+                status: req.body.status === 'true',
+                stock: parseInt(req.body.stock, 10),
+                category: req.body.category,
+                owner: req.user.role || 'admin'  // Esto asigna el rol actual como owner
+            };
 
-        const owner = req.user.role === 'premium' ? req.user.email : 'admin';
+            console.log('Datos procesados:', productData);
 
-        
-        productData.owner = owner;
+            // Validar los datos antes de guardar
+            if (isNaN(productData.price) || isNaN(productData.stock)) {
+                return res.status(400).send('Precio o stock inválidos');
+            }
 
-        
-        const newProduct = await productController.addProduct(productData);
-        res.status(201).json(newProduct);
-    } catch (error) {
-        if (error.code === 'INVALID_TYPES_ERROR') {
-            res.status(400).json({ error: error.message });
-        } else if (error.code === 'DATABASE_ERROR') {
-            res.status(500).json({ error: 'Error al agregar producto en la base de datos' });
-        } else {
-            res.status(500).json({ error: 'Error interno del servidor' });
+            // Guardar el producto en la base de datos
+            const nuevoProducto = new productModel(productData);
+            await nuevoProducto.save();
+
+            res.json({ status: 'success', message: 'Producto guardado con éxito' });
+        } catch (error) {
+            console.error('Error al subir producto:', error);
+            res.status(500).json({ status: 'error', message: 'Error interno del servidor' });
         }
     }
-});
-
+);
 router.put('/:pid', authorize('admin'), async (req, res) => {
     const productId = req.params.pid;
     const updatedData = req.body;
